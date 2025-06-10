@@ -27,4 +27,24 @@ class SubscriptionResponse
     public bool $bounced = false;
     public bool $invalid = false;
     public bool $throttled = false;
+
+    public function __construct(
+        bool $success = false,
+        bool $subscribed = false,
+        bool $requiresManualInput = false,
+        ?string $manualInputUrl = null,
+        ?Mailbox $mailbox = null,
+        bool $bounced = false,
+        bool $invalid = false,
+        bool $throttled = false
+    ) {
+        $this->success = $success;
+        $this->subscribed = $subscribed;
+        $this->requiresManualInput = $requiresManualInput;
+        $this->manualInputUrl = $manualInputUrl;
+        $this->mailbox = $mailbox;
+        $this->bounced = $bounced;
+        $this->invalid = $invalid;
+        $this->throttled = $throttled;
+    }
 }
