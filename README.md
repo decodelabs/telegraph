@@ -9,7 +9,7 @@
 
 ### Simple mailing list manager
 
-Telegraph provides ...
+Telegraph provides a reasonably opinionated way to manage and interact with third party mailing list services.
 
 ---
 
@@ -23,7 +23,7 @@ composer require decodelabs/telegraph
 
 ## Usage
 
-Coming soon...
+This package is in active development, documentation coming soon.
 
 ## Licensing
 
