@@ -13,6 +13,10 @@ use DecodeLabs\Coercion;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Nuance\SensitiveProperty;
 use DecodeLabs\Telegraph\Adapter;
+use DecodeLabs\Telegraph\Source\ListInfo;
+use DecodeLabs\Telegraph\Source\MemberInfo;
+use DecodeLabs\Telegraph\SubscriptionRequest;
+use DecodeLabs\Telegraph\SubscriptionResponse;
 
 class Mailchimp implements Adapter
 {
@@ -30,5 +34,35 @@ class Mailchimp implements Adapter
         }
 
         $this->apiKey = $apiKey;
+    }
+
+    public function getListInfo(
+        string $listId
+    ): ?ListInfo {
+        return null;
+    }
+
+    public function subscribe(
+        SubscriptionRequest $request
+    ): SubscriptionResponse {
+        return new SubscriptionResponse();
+    }
+
+    public function update(
+        SubscriptionRequest $request
+    ): SubscriptionResponse {
+        return new SubscriptionResponse();
+    }
+
+    public function unsubscribe(
+        string $email
+    ): SubscriptionResponse {
+        return new SubscriptionResponse();
+    }
+
+    public function getMemberInfo(
+        string $email
+    ): ?MemberInfo {
+        return null;
     }
 }

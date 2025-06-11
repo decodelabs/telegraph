@@ -10,12 +10,15 @@
         } ],
     "require": {
         "php": "^8.4",
+
         "decodelabs/archetype": "^0.3.10",
         "decodelabs/coercion": "^0.3.3",
         "decodelabs/exceptional": "^0.6.1",
         "decodelabs/nuance": "^0.1.2",
         "decodelabs/relay": "^0.2",
-        "decodelabs/veneer": "^0.12.8"
+        "decodelabs/veneer": "^0.12.8",
+
+        "nesbot/carbon": "^3.9"
     },
     "require-dev": {
         "decodelabs/dovetail": "^0.2.14",
