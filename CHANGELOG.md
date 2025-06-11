@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Build Config interface and Dovetail implementation
 - Added initial Adapter interface structure
 - Added initial Source container
+- Added SubscriptionRequest structure
 
 ---
 
