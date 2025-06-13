@@ -10,13 +10,36 @@ declare(strict_types=1);
 namespace DecodeLabs\Telegraph;
 
 use DecodeLabs\Exceptional;
+use DecodeLabs\Telegraph\Source\EmailType;
 
 class SubscriptionRequest
 {
     public string $listId;
     public string $email;
+    public ?bool $subscribe = null;
     public ?string $firstName = null;
-    public ?string $surname = null;
+    public ?string $lastName = null;
+
+    public ?string $fullName {
+        get {
+            if (
+                $this->firstName &&
+                $this->lastName
+            ) {
+                return trim($this->firstName . ' ' . $this->lastName);
+            }
+
+            if ($this->firstName !== null) {
+                return $this->firstName;
+            }
+
+            if ($this->lastName !== null) {
+                return $this->lastName;
+            }
+
+            return null;
+        }
+    }
 
     public ?string $country = null {
         set {
@@ -44,6 +67,8 @@ class SubscriptionRequest
         }
     }
 
+    public ?EmailType $emailType = null;
+
     /**
      * @var array<string,bool>
      */
@@ -55,64 +80,88 @@ class SubscriptionRequest
     protected(set) array $tags = [];
 
 
-
+    /**
+     * @param array<string,bool|string> $groups
+     * @param array<string,bool|string> $tags
+     */
     public function __construct(
         string $listId,
         string $email,
         ?string $firstName = null,
-        ?string $surname = null,
+        ?string $lastName = null,
         ?string $country = null,
-        ?string $language = null
+        ?string $language = null,
+        array $groups = [],
+        array $tags = []
     ) {
         $this->listId = $listId;
         $this->email = $email;
         $this->firstName = $firstName;
-        $this->surname = $surname;
+        $this->lastName = $lastName;
         $this->country = $country;
         $this->language = $language;
+
+        foreach($groups as $id => $intent) {
+            if(is_string($intent)) {
+                $id = $intent;
+                $intent = true;
+            }
+
+            $this->setGroupIntent($id, $intent);
+        }
+
+        foreach($tags as $name => $intent) {
+            if(is_string($intent)) {
+                $name = $intent;
+                $intent = true;
+            }
+
+            $this->setTagIntent($name, $intent);
+        }
     }
+
 
 
 
     public function addGroup(
-        string $name
+        string $id
     ): void {
-        $this->groups[$name] = true;
+        $this->groups[$id] = true;
     }
 
     public function removeGroup(
-        string $name
+        string $id
     ): void {
-        $this->groups[$name] = false;
+        $this->groups[$id] = false;
     }
 
     public function setGroupIntent(
-        string $name,
+        string $id,
         ?bool $intent
     ): void {
         match($intent) {
-            true => $this->addGroup($name),
-            false => $this->removeGroup($name),
-            default => $this->unsetGroup($name)
+            true => $this->addGroup($id),
+            false => $this->removeGroup($id),
+            default => $this->unsetGroup($id)
         };
     }
 
     public function getGroupIntent(
-        string $name
+        string $id
     ): ?bool {
-        return $this->groups[$name] ?? null;
+        return $this->groups[$id] ?? null;
     }
 
     public function hasGroup(
-        string $name
+        string $id
     ): bool {
-        return isset($this->groups[$name]);
+        return isset($this->groups[$id]);
     }
 
     public function unsetGroup(
-        string $name
+        string $id
     ): void {
-        unset($this->groups[$name]);
+        unset($this->groups[$id]);
     }
 
 

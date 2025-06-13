@@ -13,4 +13,12 @@ class TagInfo
 {
     protected(set) string $id;
     protected(set) string $name;
+
+    public function __construct(
+        string $id,
+        string $name
+    ) {
+        $this->id = $id;
+        $this->name = $name;
+    }
 }

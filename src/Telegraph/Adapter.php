@@ -21,7 +21,7 @@ interface Adapter
         array $settings
     );
 
-    public function getListInfo(
+    public function fetchListInfo(
         string $listId
     ): ?ListInfo;
 
@@ -34,10 +34,12 @@ interface Adapter
     ): SubscriptionResponse;
 
     public function unsubscribe(
+        string $listId,
         string $email
     ): SubscriptionResponse;
 
-    public function getMemberInfo(
+    public function fetchMemberInfo(
+        string $listId,
         string $email
     ): ?MemberInfo;
 }
