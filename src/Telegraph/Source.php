@@ -103,7 +103,11 @@ class Source extends SourceReference
             );
         }
 
-        $result = $this->adapter->subscribe($this, $request);
+        if(!$listInfo = $this->getListInfo()) {
+            return $this->newFailureResponse();
+        }
+
+        $result = $this->adapter->subscribe($this, $listInfo, $request);
 
         if($result->response->success) {
             if($result->memberInfo !== null) {
@@ -127,7 +131,11 @@ class Source extends SourceReference
             );
         }
 
-        $result = $this->adapter->subscribe($this, $request);
+        if(!$listInfo = $this->getListInfo()) {
+            return $this->newFailureResponse();
+        }
+
+        $result = $this->adapter->subscribe($this, $listInfo, $request);
 
         if($result->response->success) {
             if($result->memberInfo !== null) {
@@ -161,7 +169,11 @@ class Source extends SourceReference
         string $email,
         MemberDataRequest $request
     ): SubscriptionResponse {
-        $result = $this->adapter->update($this, $email, $request);
+        if(!$listInfo = $this->getListInfo()) {
+            return $this->newFailureResponse();
+        }
+
+        $result = $this->adapter->update($this, $listInfo, $email, $request);
 
         if($result->response->success) {
             if($result->memberInfo !== null) {
@@ -180,7 +192,11 @@ class Source extends SourceReference
         string $email,
         MemberDataRequest $request
     ): SubscriptionResponse {
-        $result = $this->adapter->update($this, $email, $request);
+        if(!$listInfo = $this->getListInfo()) {
+            return $this->newFailureResponse();
+        }
+
+        $result = $this->adapter->update($this, $listInfo, $email, $request);
 
         if($result->response->success) {
             if($result->memberInfo !== null) {
@@ -212,7 +228,11 @@ class Source extends SourceReference
         string $userId,
         string $email
     ): SubscriptionResponse {
-        $result = $this->adapter->unsubscribe($this, $email);
+        if(!$listInfo = $this->getListInfo()) {
+            return $this->newFailureResponse();
+        }
+
+        $result = $this->adapter->unsubscribe($this, $listInfo, $email);
 
         if($result->response->success) {
             $this->cache->clearMemberInfo($this, $email);
@@ -225,7 +245,11 @@ class Source extends SourceReference
     public function unsubscribe(
         string $email
     ): SubscriptionResponse {
-        $result = $this->adapter->unsubscribe($this, $email);
+        if(!$listInfo = $this->getListInfo()) {
+            return $this->newFailureResponse();
+        }
+
+        $result = $this->adapter->unsubscribe($this, $listInfo, $email);
 
         if($result->response->success) {
             $this->cache->clearMemberInfo($this, $email);
@@ -305,5 +329,15 @@ class Source extends SourceReference
 
         $this->cache->storeMemberInfo($this, $email, $info);
         return $info;
+    }
+
+    private function newFailureResponse(
+        FailureReason $reason = FailureReason::ServiceUnavailable
+    ): SubscriptionResponse {
+        return new SubscriptionResponse(
+            source: $this,
+            success: false,
+            failureReason: $reason
+        );
     }
 }

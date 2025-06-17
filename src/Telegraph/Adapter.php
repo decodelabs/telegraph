@@ -33,17 +33,20 @@ interface Adapter
 
     public function subscribe(
         SourceReference $source,
+        ListInfo $listInfo,
         MemberDataRequest $request
     ): AdapterActionResult;
 
     public function update(
         SourceReference $source,
+        ListInfo $listInfo,
         string $email,
         MemberDataRequest $request
     ): AdapterActionResult;
 
     public function unsubscribe(
         SourceReference $source,
+        ListInfo $listInfo,
         string $email
     ): AdapterActionResult;
 
