@@ -84,7 +84,7 @@ class ListInfo extends ListReference implements JsonSerializable
         $useCategory = false;
 
         foreach($this->groups as $group) {
-            $categoryName = $group->categoryName ?? 'Uncategorised';
+            $categoryName = $group->categoryName ?? 'No category';
             $categoryNames[$categoryName] = true;
 
             if(count($categoryNames) > 1) {
@@ -112,12 +112,12 @@ class ListInfo extends ListReference implements JsonSerializable
     /**
      * @return array<string,array<string,string>>
      */
-    public function getCategorisedGroupOptions(): array
+    public function getCategorizedGroupOptions(): array
     {
         $output = [];
 
         foreach($this->groups as $group) {
-            $categoryName = $group->categoryName ?? 'Uncategorised';
+            $categoryName = $group->categoryName ?? 'No category';
             $output[$categoryName][$group->id] = $group->name;
         }
 
