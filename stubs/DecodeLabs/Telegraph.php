@@ -86,11 +86,29 @@ class Telegraph implements Proxy
     public static function update(Ref5|string $source, string $email, Ref8 $request): Ref9 {
         return static::$_veneerInstance->update(...func_get_args());
     }
+    public static function updateDiscipleAll(Ref8 $request): array {
+        return static::$_veneerInstance->updateDiscipleAll(...func_get_args());
+    }
+    public static function updateUserAll(string $userId, string $email, Ref8 $request): array {
+        return static::$_veneerInstance->updateUserAll(...func_get_args());
+    }
     public static function updateAll(string $email, Ref8 $request): array {
         return static::$_veneerInstance->updateAll(...func_get_args());
     }
+    public static function unsubscribeDisciple(Ref5|string $source): Ref9 {
+        return static::$_veneerInstance->unsubscribeDisciple(...func_get_args());
+    }
+    public static function unsubscribeUser(Ref5|string $source, string $userId, string $email): Ref9 {
+        return static::$_veneerInstance->unsubscribeUser(...func_get_args());
+    }
     public static function unsubscribe(Ref5|string $source, string $email): Ref9 {
         return static::$_veneerInstance->unsubscribe(...func_get_args());
+    }
+    public static function unsubscribeDiscipleAll(): array {
+        return static::$_veneerInstance->unsubscribeDiscipleAll();
+    }
+    public static function unsubscribeUserAll(string $userId, string $email): array {
+        return static::$_veneerInstance->unsubscribeUserAll(...func_get_args());
     }
     public static function unsubscribeAll(string $email): array {
         return static::$_veneerInstance->unsubscribeAll(...func_get_args());

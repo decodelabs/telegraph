@@ -252,11 +252,7 @@ class Context
     ): SubscriptionResponse {
         return $this->load($source)
             ?->subscribeDisciple($request)
-            ?? new SubscriptionResponse(
-                source: $this->normalizeSourceReference($source),
-                success: false,
-                failureReason: FailureReason::ServiceUnavailable
-            );
+            ?? $this->newFailureResponse($source);
     }
 
     public function subscribeUser(
@@ -266,11 +262,7 @@ class Context
     ): SubscriptionResponse {
         return $this->load($source)
             ?->subscribeUser($userId, $request)
-            ?? new SubscriptionResponse(
-                source: $this->normalizeSourceReference($source),
-                success: false,
-                failureReason: FailureReason::ServiceUnavailable
-            );
+            ?? $this->newFailureResponse($source);
     }
 
     public function subscribe(
@@ -279,11 +271,7 @@ class Context
     ): SubscriptionResponse {
         return $this->load($source)
             ?->subscribe($request)
-            ?? new SubscriptionResponse(
-                source: $this->normalizeSourceReference($source),
-                success: false,
-                failureReason: FailureReason::ServiceUnavailable
-            );
+            ?? $this->newFailureResponse($source);
     }
 
     public function updateDisciple(
@@ -292,11 +280,7 @@ class Context
     ): SubscriptionResponse {
         return $this->load($source)
             ?->updateDisciple($request)
-            ?? new SubscriptionResponse(
-                source: $this->normalizeSourceReference($source),
-                success: false,
-                failureReason: FailureReason::ServiceUnavailable
-            );
+            ?? $this->newFailureResponse($source);
     }
 
     public function updateUser(
@@ -307,11 +291,7 @@ class Context
     ): SubscriptionResponse {
         return $this->load($source)
             ?->updateUser($userId, $email, $request)
-            ?? new SubscriptionResponse(
-                source: $this->normalizeSourceReference($source),
-                success: false,
-                failureReason: FailureReason::ServiceUnavailable
-            );
+            ?? $this->newFailureResponse($source);
     }
 
     public function update(
@@ -321,11 +301,39 @@ class Context
     ): SubscriptionResponse {
         return $this->load($source)
             ?->update($email, $request)
-            ?? new SubscriptionResponse(
-                source: $this->normalizeSourceReference($source),
-                success: false,
-                failureReason: FailureReason::ServiceUnavailable
-            );
+            ?? $this->newFailureResponse($source);
+    }
+
+    /**
+     * @return array<string,SubscriptionResponse>
+     */
+    public function updateDiscipleAll(
+        MemberDataRequest $request
+    ): array {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $this->updateDisciple($source, $request);
+        }
+
+        return $output;
+    }
+
+    /**
+     * @return array<string,SubscriptionResponse>
+     */
+    public function updateUserAll(
+        string $userId,
+        string $email,
+        MemberDataRequest $request
+    ): array {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $this->updateUser($source, $userId, $email, $request);
+        }
+
+        return $output;
     }
 
     /**
@@ -344,17 +352,61 @@ class Context
         return $output;
     }
 
+    public function unsubscribeDisciple(
+        string|SourceReference $source,
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->unsubscribeDisciple()
+            ?? $this->newFailureResponse($source);
+    }
+
+    public function unsubscribeUser(
+        string|SourceReference $source,
+        string $userId,
+        string $email
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->unsubscribeUser($userId, $email)
+            ?? $this->newFailureResponse($source);
+    }
+
     public function unsubscribe(
         string|SourceReference $source,
         string $email
     ): SubscriptionResponse {
         return $this->load($source)
             ?->unsubscribe($email)
-            ?? new SubscriptionResponse(
-                source: $this->normalizeSourceReference($source),
-                success: false,
-                failureReason: FailureReason::ServiceUnavailable
-            );
+            ?? $this->newFailureResponse($source);
+    }
+
+    /**
+     * @return array<string,SubscriptionResponse>
+     */
+    public function unsubscribeDiscipleAll(): array
+    {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $this->unsubscribeDisciple($source);
+        }
+
+        return $output;
+    }
+
+    /**
+     * @return array<string,SubscriptionResponse>
+     */
+    public function unsubscribeUserAll(
+        string $userId,
+        string $email
+    ): array {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $this->unsubscribeUser($source, $userId, $email);
+        }
+
+        return $output;
     }
 
     /**
@@ -391,6 +443,17 @@ class Context
         string $email
     ): ?MemberInfo {
         return $this->load($source)?->getMemberInfo($email);
+    }
+
+    private function newFailureResponse(
+        string|SourceReference $source,
+        FailureReason $reason = FailureReason::ServiceUnavailable
+    ): SubscriptionResponse {
+        return new SubscriptionResponse(
+            source: $this->normalizeSourceReference($source),
+            success: false,
+            failureReason: $reason
+        );
     }
 }
 

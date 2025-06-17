@@ -209,9 +209,8 @@ class Source extends SourceReference
         return $result->response;
     }
 
-    public function unsubscribeDisciple(
-        string $email
-    ): SubscriptionResponse {
+    public function unsubscribeDisciple(): SubscriptionResponse
+    {
         if(!class_exists(Disciple::class)) {
             throw Exceptional::ComponentUnavailable(
                 'Disciple package is not installed'
