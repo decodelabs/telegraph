@@ -12,11 +12,10 @@ namespace DecodeLabs\Telegraph;
 use DecodeLabs\Exceptional;
 use DecodeLabs\Telegraph\Source\EmailType;
 
-class SubscriptionRequest
+class MemberDataRequest
 {
-    public string $listId;
     public string $email;
-    public ?bool $subscribe = null;
+
     public ?string $firstName = null;
     public ?string $lastName = null;
 
@@ -85,16 +84,14 @@ class SubscriptionRequest
      * @param array<string,bool|string> $tags
      */
     public function __construct(
-        string $listId,
         string $email,
         ?string $firstName = null,
         ?string $lastName = null,
         ?string $country = null,
         ?string $language = null,
         array $groups = [],
-        array $tags = []
+        array $tags = [],
     ) {
-        $this->listId = $listId;
         $this->email = $email;
         $this->firstName = $firstName;
         $this->lastName = $lastName;

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace DecodeLabs\Telegraph;
 
 use DecodeLabs\Telegraph\Source\ListInfo;
+use DecodeLabs\Telegraph\Source\ListReference;
 use DecodeLabs\Telegraph\Source\MemberInfo;
 
 interface Adapter
@@ -21,25 +22,33 @@ interface Adapter
         array $settings
     );
 
+    /**
+     * @return array<ListReference>
+     */
+    public function fetchAllListReferences(): array;
+
     public function fetchListInfo(
-        string $listId
+        SourceReference $source,
     ): ?ListInfo;
 
     public function subscribe(
-        SubscriptionRequest $request
+        SourceReference $source,
+        MemberDataRequest $request
     ): SubscriptionResponse;
 
     public function update(
-        SubscriptionRequest $request
+        SourceReference $source,
+        MemberDataRequest $request
     ): SubscriptionResponse;
 
     public function unsubscribe(
-        string $listId,
+        SourceReference $source,
         string $email
     ): SubscriptionResponse;
 
     public function fetchMemberInfo(
-        string $listId,
-        string $email
+        SourceReference $source,
+        ListInfo $listInfo,
+        string $email,
     ): ?MemberInfo;
 }

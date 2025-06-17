@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Telegraph\Source;
 
-enum MemberStatus
+enum MemberStatus : string
 {
-    case Subscribed;
-    case Pending;
-    case Unsubscribed;
-    case Invalid;
-    case Archived;
+    case Subscribed = 'subscribed';
+    case Pending = 'pending';
+    case Unsubscribed = 'unsubscribed';
+    case Invalid = 'invalid';
+    case Archived = 'archived';
 }

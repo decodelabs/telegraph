@@ -13,6 +13,11 @@ interface Config
 {
     public function getDefaultSourceName(): ?string;
 
+    /**
+     * @return array<string>
+     */
+    public function getSourceNames(): array;
+
     public function getSourceAdapter(
         string $name
     ): ?string;

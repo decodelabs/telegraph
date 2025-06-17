@@ -13,8 +13,13 @@ use DecodeLabs\Archetype;
 use DecodeLabs\Dovetail;
 use DecodeLabs\Dovetail\Config\Telegraph as TelegraphConfig;
 use DecodeLabs\Exceptional;
+use DecodeLabs\Monarch;
+use DecodeLabs\Stash;
 use DecodeLabs\Telegraph;
+use DecodeLabs\Telegraph\Source\ListInfo;
+use DecodeLabs\Telegraph\Source\MemberInfo;
 use DecodeLabs\Veneer;
+use Psr\Cache\CacheItemPoolInterface;
 
 class Context
 {
@@ -24,6 +29,9 @@ class Context
     protected array $sources = [];
 
     protected ?Config $config = null;
+    protected ?Cache $cache = null;
+    protected Store|false|null $store = false;
+
 
     public function setConfig(
         ?Config $config
@@ -43,22 +51,75 @@ class Context
         return $this->config;
     }
 
-    public function loadDefault(): Source
+    public function setCache(
+        Cache|CacheItemPoolInterface $cache
+    ): void {
+        if($cache instanceof CacheItemPoolInterface) {
+            $cache = new Cache($cache);
+        }
+
+        $this->cache = $cache;
+    }
+
+    public function getCache(): Cache {
+        if(isset($this->cache)) {
+            return $this->cache;
+        }
+
+        if(class_exists(Stash::class)) {
+            return $this->cache = new Cache(
+                Stash::load(self::class)
+            );
+        }
+
+        return $this->cache = new Cache(null);
+    }
+
+    public function setStore(
+        Store $store
+    ): void {
+        $this->store = $store;
+    }
+
+    public function getStore(): ?Store
+    {
+        if($this->store !== false) {
+            return $this->store;
+        }
+
+        if(Monarch::$container->has(Store::class)) {
+            $store = Monarch::$container->get(Store::class);
+
+            if($store instanceof Store) {
+                return $this->store = $store;
+            }
+        }
+
+        return $this->store = null;
+    }
+
+    public function loadDefault(): ?Source
     {
         $config = $this->getConfig();
 
         if(!$sourceName = $config?->getDefaultSourceName()) {
-            throw Exceptional::NotFound(
-                'Telegraph default source not configured'
-            );
+            return null;
         }
 
         return $this->load($sourceName);
     }
 
     public function load(
-        string $name
-    ): Source {
+        string|SourceReference $name
+    ): ?Source {
+        if($name instanceof Source) {
+            return $name;
+        }
+
+        if($name instanceof SourceReference) {
+            $name = $name->name;
+        }
+
         if (isset($this->sources[$name])) {
             return $this->sources[$name];
         }
@@ -66,31 +127,64 @@ class Context
         $adapter = $this->loadAdapterFor($name);
         $remoteId = $this->getConfig()?->getSourceRemoteId($name);
 
-        if($remoteId === null) {
-            throw Exceptional::Setup(
-                'Telegraph remote ID not configured for source: ' . $name
-            );
+        if(
+            $remoteId === null ||
+            $adapter === null
+        ) {
+            return null;
         }
 
         $source = new Source(
-            $name,
-            $adapter,
-            $remoteId
+            name: $name,
+            remoteId: $remoteId,
+            adapter: $adapter,
+            cache: $this->getCache(),
+            store: $this->getStore(),
         );
 
         return $this->sources[$name] = $source;
     }
 
+    /**
+     * @return array<string,Source>
+     */
+    public function loadAll(): array
+    {
+        $names = $this->getConfig()?->getSourceNames() ?? [];
+
+        foreach($names as $name) {
+            $this->load($name);
+        }
+
+        return $this->sources;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getSourceNames(): array
+    {
+        return $this->getConfig()?->getSourceNames() ?? [];
+    }
+
+    public function hasSource(
+        string $name
+    ): bool {
+        if(isset($this->sources[$name])) {
+            return true;
+        }
+
+        return (bool) $this->getConfig()?->getSourceRemoteId($name);
+    }
 
 
-    public function loadDefaultAdapter(): Adapter
+
+    public function loadDefaultAdapter(): ?Adapter
     {
         $config = $this->getConfig();
 
         if(!$sourceName = $config?->getDefaultSourceName()) {
-            throw Exceptional::NotFound(
-                'Telegraph default source not configured'
-            );
+            return null;
         }
 
         return $this->loadAdapterFor($sourceName);
@@ -98,17 +192,13 @@ class Context
 
     public function loadAdapterFor(
         string $name
-    ): Adapter {
+    ): ?Adapter {
         if (!$config = $this->getConfig()) {
-            throw Exceptional::ComponentUnavailable(
-                'Telegraph config not set'
-            );
+            return null;
         }
 
         if(!$adapterName = $config->getSourceAdapter($name)) {
-            throw Exceptional::NotFound(
-                'Telegraph adapter not configured: ' . $name
-            );
+            return null;
         }
 
         $settings = $config->getSourceSettings($name);
@@ -131,6 +221,119 @@ class Context
         }
 
         return new $class($settings);
+    }
+
+    protected function normalizeSourceReference(
+        string|SourceReference $source
+    ): SourceReference {
+        if($source instanceof SourceReference) {
+            return $source;
+        }
+
+        if(isset($this->sources[$source])) {
+            return $this->sources[$source];
+        }
+
+        return new SourceReference($source, '--');
+    }
+
+
+
+
+    public function getListInfo(
+        string|SourceReference $source
+    ): ?ListInfo {
+        return $this->load($source)?->getListInfo();
+    }
+
+    public function subscribe(
+        string|SourceReference $source,
+        MemberDataRequest $request
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->subscribe($request)
+            ?? new SubscriptionResponse(
+                source: $this->normalizeSourceReference($source),
+                success: false,
+                failureReason: FailureReason::ServiceUnavailable
+            );
+    }
+
+    public function update(
+        string|SourceReference $source,
+        MemberDataRequest $request
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->update($request)
+            ?? new SubscriptionResponse(
+                source: $this->normalizeSourceReference($source),
+                success: false,
+                failureReason: FailureReason::ServiceUnavailable
+            );
+    }
+
+    /**
+     * @return array<string,SubscriptionResponse>
+     */
+    public function updateAll(
+        MemberDataRequest $request
+    ): array {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $this->update($source, $request);
+        }
+
+        return $output;
+    }
+
+    public function unsubscribe(
+        string|SourceReference $source,
+        string $email
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->unsubscribe($email)
+            ?? new SubscriptionResponse(
+                source: $this->normalizeSourceReference($source),
+                success: false,
+                failureReason: FailureReason::ServiceUnavailable
+            );
+    }
+
+    /**
+     * @return array<string,SubscriptionResponse>
+     */
+    public function unsubscribeAll(
+        string $email
+    ): array {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $this->unsubscribe($source, $email);
+        }
+
+        return $output;
+    }
+
+    public function getDiscipleMemberInfo(
+        string|SourceReference $source,
+    ): ?MemberInfo {
+        return $this->load($source)?->getDiscipleMemberInfo();
+    }
+
+    public function getUserMemberInfo(
+        string|SourceReference $source,
+        string $userId,
+        string $email
+    ): ?MemberInfo {
+        return $this->load($source)?->getUserMemberInfo($userId, $email);
+    }
+
+    public function getMemberInfo(
+        string|SourceReference $source,
+        string $email
+    ): ?MemberInfo {
+        return $this->load($source)?->getMemberInfo($email);
     }
 }
 

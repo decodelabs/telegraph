@@ -12,27 +12,35 @@
         "php": "^8.4",
 
         "decodelabs/archetype": "^0.3.10",
-        "decodelabs/coercion": "^0.3.3",
+        "decodelabs/coercion": "^0.3.4",
         "decodelabs/exceptional": "^0.6.1",
+        "decodelabs/monarch": "^0.1.4",
         "decodelabs/nuance": "^0.1.2",
         "decodelabs/relay": "^0.2",
         "decodelabs/veneer": "^0.12.8",
 
-        "nesbot/carbon": "^3.9"
+        "nesbot/carbon": "^3.9",
+        "psr/cache": "^3.0"
     },
     "require-dev": {
+        "decodelabs/commandment": "^0.2.2",
+        "decodelabs/disciple": "^0.5.1",
         "decodelabs/dovetail": "^0.2.14",
-        "decodelabs/phpstan-decodelabs": "^0.7.0"
+        "decodelabs/phpstan-decodelabs": "^0.7.0",
+        "decodelabs/terminus": "^0.13.1"
     },
     "conflict": {
-        "decodelabs/dovetail": "<0.2"
+        "decodelabs/disciple": "<0.5",
+        "decodelabs/dovetail": "<0.2",
+        "decodelabs/terminus": "<0.13"
     },
     "suggest": {
         "decodelabs/dovetail": "For dovetail config integration"
     },
     "autoload": {
         "psr-4": {
-            "DecodeLabs\\Telegraph\\": "src/Telegraph/"
+            "DecodeLabs\\Telegraph\\": "src/Telegraph/",
+            "DecodeLabs\\Commandment\\": "src/Commandment/"
         },
         "classmap": [
             "src/Dovetail/"

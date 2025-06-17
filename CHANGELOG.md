@@ -5,7 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
---
+- Renamed SubscriptionRequest to MemberDataRequest
+- Simplified SubscriptionResponse interface
+- Added FailureReason enum
+- Added SourceReference structure
+- Implemented Source controller interface
+- Added shortcut methods to context
+- Added PSR cache support
+- Added data Store interface support
+- Added Disciple support
+- Implemented helper Commandment Actions
 
 ---
 

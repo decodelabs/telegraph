@@ -10,41 +10,46 @@ declare(strict_types=1);
 namespace DecodeLabs\Telegraph;
 
 use DecodeLabs\Relay\Mailbox;
+use DecodeLabs\Telegraph\Source\MemberStatus;
 
 class SubscriptionResponse
 {
+    public SourceReference $source;
+
     public bool $success = false;
-    public bool $subscribed = false;
-    public bool $requiresManualInput = false;
+    public ?FailureReason $failureReason = null;
     public ?string $manualInputUrl = null;
 
+    public ?MemberStatus $status = null;
     public ?Mailbox $mailbox = null {
         set(string|Mailbox|null $value) {
             $this->mailbox = Mailbox::create($value);
         }
     }
 
-    public bool $bounced = false;
-    public bool $invalid = false;
-    public bool $throttled = false;
+    public bool $subscribed {
+        get => $this->status === MemberStatus::Subscribed;
+    }
+
+    public bool $requiresManualInput {
+        get => $this->manualInputUrl !== null;
+    }
 
     public function __construct(
+        SourceReference $source,
         bool $success = false,
-        bool $subscribed = false,
-        bool $requiresManualInput = false,
+        ?FailureReason $failureReason = null,
         ?string $manualInputUrl = null,
-        ?Mailbox $mailbox = null,
-        bool $bounced = false,
-        bool $invalid = false,
-        bool $throttled = false
+        ?MemberStatus $status = null,
+        ?Mailbox $mailbox = null
     ) {
+        $this->source = $source;
+
         $this->success = $success;
-        $this->subscribed = $subscribed;
-        $this->requiresManualInput = $requiresManualInput;
+        $this->failureReason = $failureReason;
         $this->manualInputUrl = $manualInputUrl;
+
+        $this->status = $status;
         $this->mailbox = $mailbox;
-        $this->bounced = $bounced;
-        $this->invalid = $invalid;
-        $this->throttled = $throttled;
     }
 }

@@ -46,6 +46,23 @@ class Telegraph implements Config, ConfigInterface
         return $firstKey;
     }
 
+    public function getSourceNames(): array
+    {
+        $output = [];
+
+        foreach($this->data->getKeys() as $key) {
+            $key = (string)$key;
+
+            if(str_starts_with($key, '!')) {
+                continue;
+            }
+
+            $output[] = $key;
+        }
+
+        return $output;
+    }
+
     public function getSourceAdapter(
         string $name
     ): ?string {

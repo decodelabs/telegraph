@@ -9,8 +9,16 @@ use DecodeLabs\Veneer\Proxy as Proxy;
 use DecodeLabs\Veneer\ProxyTrait as ProxyTrait;
 use DecodeLabs\Telegraph\Context as Inst;
 use DecodeLabs\Telegraph\Config as Ref0;
-use DecodeLabs\Telegraph\Source as Ref1;
-use DecodeLabs\Telegraph\Adapter as Ref2;
+use DecodeLabs\Telegraph\Cache as Ref1;
+use Psr\Cache\CacheItemPoolInterface as Ref2;
+use DecodeLabs\Telegraph\Store as Ref3;
+use DecodeLabs\Telegraph\Source as Ref4;
+use DecodeLabs\Telegraph\SourceReference as Ref5;
+use DecodeLabs\Telegraph\Adapter as Ref6;
+use DecodeLabs\Telegraph\Source\ListInfo as Ref7;
+use DecodeLabs\Telegraph\MemberDataRequest as Ref8;
+use DecodeLabs\Telegraph\SubscriptionResponse as Ref9;
+use DecodeLabs\Telegraph\Source\MemberInfo as Ref10;
 
 class Telegraph implements Proxy
 {
@@ -25,19 +33,63 @@ class Telegraph implements Proxy
     public static function getConfig(): ?Ref0 {
         return static::$_veneerInstance->getConfig();
     }
-    public static function loadDefault(): Ref1 {
+    public static function setCache(Ref1|Ref2 $cache): void {}
+    public static function getCache(): Ref1 {
+        return static::$_veneerInstance->getCache();
+    }
+    public static function setStore(Ref3 $store): void {}
+    public static function getStore(): ?Ref3 {
+        return static::$_veneerInstance->getStore();
+    }
+    public static function loadDefault(): ?Ref4 {
         return static::$_veneerInstance->loadDefault();
     }
-    public static function load(string $name): Ref1 {
+    public static function load(Ref5|string $name): ?Ref4 {
         return static::$_veneerInstance->load(...func_get_args());
     }
-    public static function loadDefaultAdapter(): Ref2 {
+    public static function loadAll(): array {
+        return static::$_veneerInstance->loadAll();
+    }
+    public static function getSourceNames(): array {
+        return static::$_veneerInstance->getSourceNames();
+    }
+    public static function hasSource(string $name): bool {
+        return static::$_veneerInstance->hasSource(...func_get_args());
+    }
+    public static function loadDefaultAdapter(): ?Ref6 {
         return static::$_veneerInstance->loadDefaultAdapter();
     }
-    public static function loadAdapterFor(string $name): Ref2 {
+    public static function loadAdapterFor(string $name): ?Ref6 {
         return static::$_veneerInstance->loadAdapterFor(...func_get_args());
     }
-    public static function loadAdapter(string $name, array $settings = []): Ref2 {
+    public static function loadAdapter(string $name, array $settings = []): Ref6 {
         return static::$_veneerInstance->loadAdapter(...func_get_args());
+    }
+    public static function getListInfo(Ref5|string $source): ?Ref7 {
+        return static::$_veneerInstance->getListInfo(...func_get_args());
+    }
+    public static function subscribe(Ref5|string $source, Ref8 $request): Ref9 {
+        return static::$_veneerInstance->subscribe(...func_get_args());
+    }
+    public static function update(Ref5|string $source, Ref8 $request): Ref9 {
+        return static::$_veneerInstance->update(...func_get_args());
+    }
+    public static function updateAll(Ref8 $request): array {
+        return static::$_veneerInstance->updateAll(...func_get_args());
+    }
+    public static function unsubscribe(Ref5|string $source, string $email): Ref9 {
+        return static::$_veneerInstance->unsubscribe(...func_get_args());
+    }
+    public static function unsubscribeAll(string $email): array {
+        return static::$_veneerInstance->unsubscribeAll(...func_get_args());
+    }
+    public static function getDiscipleMemberInfo(Ref5|string $source): ?Ref10 {
+        return static::$_veneerInstance->getDiscipleMemberInfo(...func_get_args());
+    }
+    public static function getUserMemberInfo(Ref5|string $source, string $userId, string $email): ?Ref10 {
+        return static::$_veneerInstance->getUserMemberInfo(...func_get_args());
+    }
+    public static function getMemberInfo(Ref5|string $source, string $email): ?Ref10 {
+        return static::$_veneerInstance->getMemberInfo(...func_get_args());
     }
 };

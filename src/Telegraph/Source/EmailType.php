@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Telegraph\Source;
 
-enum EmailType
+enum EmailType : string
 {
-    case Html;
-    case Text;
+    case Html = 'html';
+    case Text = 'text';
 }
