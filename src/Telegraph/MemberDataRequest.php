@@ -14,7 +14,7 @@ use DecodeLabs\Telegraph\Source\EmailType;
 
 class MemberDataRequest
 {
-    public string $email;
+    public ?string $email = null;
 
     public ?string $firstName = null;
     public ?string $lastName = null;
@@ -84,7 +84,7 @@ class MemberDataRequest
      * @param array<string,bool|string> $tags
      */
     public function __construct(
-        string $email,
+        ?string $email = null,
         ?string $firstName = null,
         ?string $lastName = null,
         ?string $country = null,

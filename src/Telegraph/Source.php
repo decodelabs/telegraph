@@ -54,29 +54,184 @@ class Source extends SourceReference
         return $info;
     }
 
+    public function subscribeDisciple(
+        ?MemberDataRequest $request = null
+    ): SubscriptionResponse {
+        if(!class_exists(Disciple::class)) {
+            throw Exceptional::ComponentUnavailable(
+                'Disciple package is not installed'
+            );
+        }
+
+        if($request === null) {
+            $request = new MemberDataRequest();
+        }
+
+        if($request->email === null) {
+            $request->email = Disciple::getEmail();
+        }
+
+        if($request->firstName === null) {
+            $request->firstName = Disciple::getFirstName();
+        }
+
+        if($request->lastName === null) {
+            $request->lastName = Disciple::getSurname();
+        }
+
+        if($request->country === null) {
+            $request->country = Disciple::getCountry();
+        }
+
+        if($request->language === null) {
+            $request->language = Disciple::getLanguage();
+        }
+
+        return $this->subscribeUser(
+            Disciple::getActiveId(),
+            $request
+        );
+    }
+
+    public function subscribeUser(
+        string $userId,
+        MemberDataRequest $request
+    ): SubscriptionResponse {
+        if($request->email === null) {
+            throw Exceptional::InvalidArgument(
+                'Email address is required'
+            );
+        }
+
+        $result = $this->adapter->subscribe($this, $request);
+
+        if($result->response->success) {
+            if($result->memberInfo !== null) {
+                $this->cache->storeMemberInfo($this, $request->email, $result->memberInfo);
+                $this->store?->storeMemberInfo($this, $userId, $result->memberInfo);
+            } else {
+                $this->cache->clearMemberInfo($this, $request->email);
+                $this->store?->clearMemberInfo($this, $userId);
+            }
+        }
+
+        return $result->response;
+    }
+
     public function subscribe(
         MemberDataRequest $request
     ): SubscriptionResponse {
-        return $this->adapter->subscribe($this, $request);
+        if($request->email === null) {
+            throw Exceptional::InvalidArgument(
+                'Email address is required'
+            );
+        }
+
+        $result = $this->adapter->subscribe($this, $request);
+
+        if($result->response->success) {
+            if($result->memberInfo !== null) {
+                $this->cache->storeMemberInfo($this, $request->email, $result->memberInfo);
+            } else {
+                $this->cache->clearMemberInfo($this, $request->email);
+            }
+        }
+
+        return $result->response;
+    }
+
+    public function updateDisciple(
+        MemberDataRequest $request
+    ): SubscriptionResponse {
+        if(!class_exists(Disciple::class)) {
+            throw Exceptional::ComponentUnavailable(
+                'Disciple package is not installed'
+            );
+        }
+
+        return $this->updateUser(
+            Disciple::getActiveId(),
+            (string)Disciple::getEmail(),
+            $request
+        );
+    }
+
+    public function updateUser(
+        string $userId,
+        string $email,
+        MemberDataRequest $request
+    ): SubscriptionResponse {
+        $result = $this->adapter->update($this, $email, $request);
+
+        if($result->response->success) {
+            if($result->memberInfo !== null) {
+                $this->cache->storeMemberInfo($this, $email, $result->memberInfo);
+                $this->store?->storeMemberInfo($this, $userId, $result->memberInfo);
+            } else {
+                $this->cache->clearMemberInfo($this, $email);
+                $this->store?->clearMemberInfo($this, $userId);
+            }
+        }
+
+        return $result->response;
     }
 
     public function update(
+        string $email,
         MemberDataRequest $request
     ): SubscriptionResponse {
-        return $this->adapter->update($this, $request);
+        $result = $this->adapter->update($this, $email, $request);
+
+        if($result->response->success) {
+            if($result->memberInfo !== null) {
+                $this->cache->storeMemberInfo($this, $email, $result->memberInfo);
+            } else {
+                $this->cache->clearMemberInfo($this, $email);
+            }
+        }
+
+        return $result->response;
+    }
+
+    public function unsubscribeDisciple(
+        string $email
+    ): SubscriptionResponse {
+        if(!class_exists(Disciple::class)) {
+            throw Exceptional::ComponentUnavailable(
+                'Disciple package is not installed'
+            );
+        }
+
+        return $this->unsubscribeUser(
+            Disciple::getActiveId(),
+            (string)Disciple::getEmail()
+        );
+    }
+
+    public function unsubscribeUser(
+        string $userId,
+        string $email
+    ): SubscriptionResponse {
+        $result = $this->adapter->unsubscribe($this, $email);
+
+        if($result->response->success) {
+            $this->cache->clearMemberInfo($this, $email);
+            $this->store?->clearMemberInfo($this, $userId);
+        }
+
+        return $result->response;
     }
 
     public function unsubscribe(
         string $email
     ): SubscriptionResponse {
-        $output = $this->adapter->unsubscribe($this, $email);
+        $result = $this->adapter->unsubscribe($this, $email);
 
-        if($output->success) {
+        if($result->response->success) {
             $this->cache->clearMemberInfo($this, $email);
-            $this->store?->clearMemberInfo($this, $email);
         }
 
-        return $output;
+        return $result->response;
     }
 
     public function getDiscipleMemberInfo(): ?MemberInfo

@@ -246,6 +246,33 @@ class Context
         return $this->load($source)?->getListInfo();
     }
 
+    public function subscribeDisciple(
+        string|SourceReference $source,
+        ?MemberDataRequest $request = null
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->subscribeDisciple($request)
+            ?? new SubscriptionResponse(
+                source: $this->normalizeSourceReference($source),
+                success: false,
+                failureReason: FailureReason::ServiceUnavailable
+            );
+    }
+
+    public function subscribeUser(
+        string|SourceReference $source,
+        string $userId,
+        MemberDataRequest $request
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->subscribeUser($userId, $request)
+            ?? new SubscriptionResponse(
+                source: $this->normalizeSourceReference($source),
+                success: false,
+                failureReason: FailureReason::ServiceUnavailable
+            );
+    }
+
     public function subscribe(
         string|SourceReference $source,
         MemberDataRequest $request
@@ -259,12 +286,41 @@ class Context
             );
     }
 
-    public function update(
+    public function updateDisciple(
         string|SourceReference $source,
         MemberDataRequest $request
     ): SubscriptionResponse {
         return $this->load($source)
-            ?->update($request)
+            ?->updateDisciple($request)
+            ?? new SubscriptionResponse(
+                source: $this->normalizeSourceReference($source),
+                success: false,
+                failureReason: FailureReason::ServiceUnavailable
+            );
+    }
+
+    public function updateUser(
+        string|SourceReference $source,
+        string $userId,
+        string $email,
+        MemberDataRequest $request
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->updateUser($userId, $email, $request)
+            ?? new SubscriptionResponse(
+                source: $this->normalizeSourceReference($source),
+                success: false,
+                failureReason: FailureReason::ServiceUnavailable
+            );
+    }
+
+    public function update(
+        string|SourceReference $source,
+        string $email,
+        MemberDataRequest $request
+    ): SubscriptionResponse {
+        return $this->load($source)
+            ?->update($email, $request)
             ?? new SubscriptionResponse(
                 source: $this->normalizeSourceReference($source),
                 success: false,
@@ -276,12 +332,13 @@ class Context
      * @return array<string,SubscriptionResponse>
      */
     public function updateAll(
+        string $email,
         MemberDataRequest $request
     ): array {
         $output = [];
 
         foreach($this->loadAll() as $source) {
-            $output[$source->name] = $this->update($source, $request);
+            $output[$source->name] = $this->update($source, $email, $request);
         }
 
         return $output;

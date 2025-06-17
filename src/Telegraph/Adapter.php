@@ -34,17 +34,18 @@ interface Adapter
     public function subscribe(
         SourceReference $source,
         MemberDataRequest $request
-    ): SubscriptionResponse;
+    ): AdapterActionResult;
 
     public function update(
         SourceReference $source,
+        string $email,
         MemberDataRequest $request
-    ): SubscriptionResponse;
+    ): AdapterActionResult;
 
     public function unsubscribe(
         SourceReference $source,
         string $email
-    ): SubscriptionResponse;
+    ): AdapterActionResult;
 
     public function fetchMemberInfo(
         SourceReference $source,

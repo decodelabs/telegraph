@@ -68,13 +68,25 @@ class Telegraph implements Proxy
     public static function getListInfo(Ref5|string $source): ?Ref7 {
         return static::$_veneerInstance->getListInfo(...func_get_args());
     }
+    public static function subscribeDisciple(Ref5|string $source, ?Ref8 $request = NULL): Ref9 {
+        return static::$_veneerInstance->subscribeDisciple(...func_get_args());
+    }
+    public static function subscribeUser(Ref5|string $source, string $userId, Ref8 $request): Ref9 {
+        return static::$_veneerInstance->subscribeUser(...func_get_args());
+    }
     public static function subscribe(Ref5|string $source, Ref8 $request): Ref9 {
         return static::$_veneerInstance->subscribe(...func_get_args());
     }
-    public static function update(Ref5|string $source, Ref8 $request): Ref9 {
+    public static function updateDisciple(Ref5|string $source, Ref8 $request): Ref9 {
+        return static::$_veneerInstance->updateDisciple(...func_get_args());
+    }
+    public static function updateUser(Ref5|string $source, string $userId, string $email, Ref8 $request): Ref9 {
+        return static::$_veneerInstance->updateUser(...func_get_args());
+    }
+    public static function update(Ref5|string $source, string $email, Ref8 $request): Ref9 {
         return static::$_veneerInstance->update(...func_get_args());
     }
-    public static function updateAll(Ref8 $request): array {
+    public static function updateAll(string $email, Ref8 $request): array {
         return static::$_veneerInstance->updateAll(...func_get_args());
     }
     public static function unsubscribe(Ref5|string $source, string $email): Ref9 {
