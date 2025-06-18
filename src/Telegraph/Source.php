@@ -14,6 +14,7 @@ use DecodeLabs\Exceptional;
 use DecodeLabs\Telegraph\Source\GroupInfo;
 use DecodeLabs\Telegraph\Source\ListInfo;
 use DecodeLabs\Telegraph\Source\MemberInfo;
+use DecodeLabs\Telegraph\Source\MemberStatus;
 use DecodeLabs\Telegraph\Source\TagInfo;
 
 class Source extends SourceReference
@@ -269,39 +270,6 @@ class Source extends SourceReference
         return $this->isMemberSubscribed($info, $group, $tag);
     }
 
-    private function isMemberSubscribed(
-        ?MemberInfo $info,
-        string|GroupInfo|null $group = null,
-        string|TagInfo|null $tag = null
-    ): bool {
-        if($info === null) {
-            return false;
-        }
-
-        if($group instanceof GroupInfo) {
-            $group = $group->id;
-        }
-
-        if($tag instanceof TagInfo) {
-            $tag = $tag->id;
-        }
-
-        if($group !== null) {
-            if(!isset($info->groups[$group])) {
-                return false;
-            }
-        }
-
-        if($tag !== null) {
-            if(!isset($info->tags[$tag])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
     public function updateDisciple(
         MemberDataRequest $request
     ): SubscriptionResponse {
@@ -411,8 +379,9 @@ class Source extends SourceReference
         return $result->response;
     }
 
-    public function getDiscipleMemberInfo(): ?MemberInfo
-    {
+    public function getDiscipleMemberInfo(
+        bool $force = false
+    ): ?MemberInfo {
         if(!class_exists(Disciple::class)) {
             throw Exceptional::ComponentUnavailable(
                 'Disciple package is not installed'
@@ -421,7 +390,8 @@ class Source extends SourceReference
 
         return $this->getUserMemberInfo(
             Disciple::getActiveId(),
-            (string)Disciple::getEmail()
+            (string)Disciple::getEmail(),
+            $force
         );
     }
 
@@ -434,14 +404,15 @@ class Source extends SourceReference
 
     public function getUserMemberInfo(
         string $userId,
-        string $email
+        string $email,
+        bool $force = false
     ): ?MemberInfo {
         if(null !== ($info = $this->cache->fetchMemberInfo($this, $email))) {
             if($info === false) {
                 return null;
             }
 
-            return $info;
+            return $this->checkMemberSubscribed($info, force: $force);
         }
 
         if($info = $this->store?->fetchMemberInfo($this, $userId)) {
@@ -463,7 +434,7 @@ class Source extends SourceReference
         }
 
         $this->cache->storeMemberInfo($this, $email, $info);
-        return $info;
+        return $this->checkMemberSubscribed($info, force: $force);
     }
 
     public function refreshUserMemberInfo(
@@ -478,13 +449,14 @@ class Source extends SourceReference
 
     public function getMemberInfo(
         string $email,
+        bool $force = false
     ): ?MemberInfo {
         if(null !== ($info = $this->cache->fetchMemberInfo($this, $email))) {
             if($info === false) {
                 return null;
             }
 
-            return $info;
+            return $this->checkMemberSubscribed($info, force: $force);
         }
 
         if(!$listInfo = $this->getListInfo()) {
@@ -498,7 +470,7 @@ class Source extends SourceReference
         );
 
         $this->cache->storeMemberInfo($this, $email, $info);
-        return $info;
+        return $this->checkMemberSubscribed($info, force: $force);
     }
 
     public function refreshMemberInfo(
@@ -506,6 +478,54 @@ class Source extends SourceReference
     ): ?MemberInfo {
         $this->cache->clearMemberInfo($this, $email);
         return $this->getMemberInfo($email);
+    }
+
+    private function isMemberSubscribed(
+        ?MemberInfo $info,
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null
+    ): bool {
+        if(
+            $info === null ||
+            $info->status !== MemberStatus::Subscribed
+        ) {
+            return false;
+        }
+
+        if($group instanceof GroupInfo) {
+            $group = $group->id;
+        }
+
+        if($tag instanceof TagInfo) {
+            $tag = $tag->id;
+        }
+
+        if($group !== null) {
+            if(!isset($info->groups[$group])) {
+                return false;
+            }
+        }
+
+        if($tag !== null) {
+            if(!isset($info->tags[$tag])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function checkMemberSubscribed(
+        ?MemberInfo $info,
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null,
+        bool $force = false
+    ): ?MemberInfo {
+        if($this->isMemberSubscribed($info, $group, $tag)) {
+            return $info;
+        }
+
+        return $force ? $info : null;
     }
 
     private function newFailureResponse(

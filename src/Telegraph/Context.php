@@ -565,8 +565,9 @@ class Context
 
     public function getDiscipleMemberInfo(
         string|SourceReference $source,
+        bool $force = false
     ): ?MemberInfo {
-        return $this->load($source)?->getDiscipleMemberInfo();
+        return $this->load($source)?->getDiscipleMemberInfo($force);
     }
 
     public function refreshDiscipleMemberInfo(
@@ -592,9 +593,10 @@ class Context
     public function getUserMemberInfo(
         string|SourceReference $source,
         string $userId,
-        string $email
+        string $email,
+        bool $force = false
     ): ?MemberInfo {
-        return $this->load($source)?->getUserMemberInfo($userId, $email);
+        return $this->load($source)?->getUserMemberInfo($userId, $email, $force);
     }
 
     public function refreshUserMemberInfo(
@@ -623,9 +625,10 @@ class Context
 
     public function getMemberInfo(
         string|SourceReference $source,
-        string $email
+        string $email,
+        bool $force = false
     ): ?MemberInfo {
-        return $this->load($source)?->getMemberInfo($email);
+        return $this->load($source)?->getMemberInfo($email, $force);
     }
 
     public function refreshMemberInfo(

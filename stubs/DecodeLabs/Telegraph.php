@@ -160,7 +160,7 @@ class Telegraph implements Proxy
     public static function unsubscribeAll(string $email): array {
         return static::$_veneerInstance->unsubscribeAll(...func_get_args());
     }
-    public static function getDiscipleMemberInfo(Ref5|string $source): ?Ref12 {
+    public static function getDiscipleMemberInfo(Ref5|string $source, bool $force = false): ?Ref12 {
         return static::$_veneerInstance->getDiscipleMemberInfo(...func_get_args());
     }
     public static function refreshDiscipleMemberInfo(Ref5|string $source): ?Ref12 {
@@ -169,7 +169,7 @@ class Telegraph implements Proxy
     public static function refreshDiscipleMemberInfoAll(): array {
         return static::$_veneerInstance->refreshDiscipleMemberInfoAll();
     }
-    public static function getUserMemberInfo(Ref5|string $source, string $userId, string $email): ?Ref12 {
+    public static function getUserMemberInfo(Ref5|string $source, string $userId, string $email, bool $force = false): ?Ref12 {
         return static::$_veneerInstance->getUserMemberInfo(...func_get_args());
     }
     public static function refreshUserMemberInfo(Ref5|string $source, string $userId, string $email): ?Ref12 {
@@ -178,7 +178,7 @@ class Telegraph implements Proxy
     public static function refreshUserMemberInfoAll(string $userId, string $email): array {
         return static::$_veneerInstance->refreshUserMemberInfoAll(...func_get_args());
     }
-    public static function getMemberInfo(Ref5|string $source, string $email): ?Ref12 {
+    public static function getMemberInfo(Ref5|string $source, string $email, bool $force = false): ?Ref12 {
         return static::$_veneerInstance->getMemberInfo(...func_get_args());
     }
     public static function refreshMemberInfo(Ref5|string $source, string $email): ?Ref12 {
