@@ -59,10 +59,15 @@ class Source extends SourceReference
 
     public function refreshListInfo(): ?ListInfo
     {
-        $this->store?->clearListInfo($this);
-        $this->cache->clearListInfo($this);
+        if($info = $this->adapter->fetchListInfo($this)) {
+            $this->store?->storeListInfo($this, $info);
+            $this->cache->storeListInfo($this, $info);
+        } else {
+            $this->store?->clearListInfo($this);
+            $this->cache->clearListInfo($this);
+        }
 
-        return $this->getListInfo();
+        return $info;
     }
 
     /**
@@ -445,10 +450,20 @@ class Source extends SourceReference
         string $userId,
         string $email
     ): ?MemberInfo {
-        $this->store?->clearMemberInfo($this, $userId);
-        $this->cache->clearMemberInfo($this, $email);
+        if(!$listInfo = $this->getListInfo()) {
+            return null;
+        }
 
-        return $this->getUserMemberInfo($userId, $email);
+        $info = $this->adapter->fetchMemberInfo(
+            $this,
+            $listInfo,
+            $email,
+        );
+
+        $this->store?->storeMemberInfo($this, $userId, $info);
+        $this->cache->storeMemberInfo($this, $email, $info);
+
+        return $this->checkMemberSubscribed($info);
     }
 
     public function getMemberInfo(
@@ -480,8 +495,18 @@ class Source extends SourceReference
     public function refreshMemberInfo(
         string $email
     ): ?MemberInfo {
-        $this->cache->clearMemberInfo($this, $email);
-        return $this->getMemberInfo($email);
+        if(!$listInfo = $this->getListInfo()) {
+            return null;
+        }
+
+        $info = $this->adapter->fetchMemberInfo(
+            $this,
+            $listInfo,
+            $email,
+        );
+
+        $this->cache->storeMemberInfo($this, $email, $info);
+        return $this->checkMemberSubscribed($info);
     }
 
     private function isMemberSubscribed(
