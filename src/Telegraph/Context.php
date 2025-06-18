@@ -248,6 +248,26 @@ class Context
         return $this->load($source)?->getListInfo();
     }
 
+    public function refreshListInfo(
+        string|SourceReference $source
+    ): ?ListInfo {
+        return $this->load($source)?->refreshListInfo();
+    }
+
+    /**
+     * @return array<string,?ListInfo>
+     */
+    public function refreshListInfoAll(): array
+    {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $source->refreshListInfo();
+        }
+
+        return $output;
+    }
+
 
     /**
      * @return array<string,string>
@@ -518,6 +538,26 @@ class Context
         return $this->load($source)?->getDiscipleMemberInfo();
     }
 
+    public function refreshDiscipleMemberInfo(
+        string|SourceReference $source,
+    ): ?MemberInfo {
+        return $this->load($source)?->refreshDiscipleMemberInfo();
+    }
+
+    /**
+     * @return array<string,?MemberInfo>
+     */
+    public function refreshDiscipleMemberInfoAll(): array
+    {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $source->refreshDiscipleMemberInfo();
+        }
+
+        return $output;
+    }
+
     public function getUserMemberInfo(
         string|SourceReference $source,
         string $userId,
@@ -526,11 +566,57 @@ class Context
         return $this->load($source)?->getUserMemberInfo($userId, $email);
     }
 
+    public function refreshUserMemberInfo(
+        string|SourceReference $source,
+        string $userId,
+        string $email
+    ): ?MemberInfo {
+        return $this->load($source)?->refreshUserMemberInfo($userId, $email);
+    }
+
+    /**
+     * @return array<string,?MemberInfo>
+     */
+    public function refreshUserMemberInfoAll(
+        string $userId,
+        string $email
+    ): array {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $this->refreshUserMemberInfo($source, $userId, $email);
+        }
+
+        return $output;
+    }
+
     public function getMemberInfo(
         string|SourceReference $source,
         string $email
     ): ?MemberInfo {
         return $this->load($source)?->getMemberInfo($email);
+    }
+
+    public function refreshMemberInfo(
+        string|SourceReference $source,
+        string $email
+    ): ?MemberInfo {
+        return $this->load($source)?->refreshMemberInfo($email);
+    }
+
+    /**
+     * @return array<string,?MemberInfo>
+     */
+    public function refreshMemberInfoAll(
+        string $email
+    ): array {
+        $output = [];
+
+        foreach($this->loadAll() as $source) {
+            $output[$source->name] = $this->refreshMemberInfo($source, $email);
+        }
+
+        return $output;
     }
 
     private function newFailureResponse(

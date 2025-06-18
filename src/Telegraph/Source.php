@@ -56,6 +56,14 @@ class Source extends SourceReference
         return $info;
     }
 
+    public function refreshListInfo(): ?ListInfo
+    {
+        $this->store?->clearListInfo($this);
+        $this->cache->clearListInfo($this);
+
+        return $this->getListInfo();
+    }
+
     /**
      * @return array<string,string>
      */
@@ -348,6 +356,13 @@ class Source extends SourceReference
         );
     }
 
+    public function refreshDiscipleMemberInfo(): ?MemberInfo {
+        return $this->refreshUserMemberInfo(
+            Disciple::getActiveId(),
+            (string)Disciple::getEmail()
+        );
+    }
+
     public function getUserMemberInfo(
         string $userId,
         string $email
@@ -382,6 +397,16 @@ class Source extends SourceReference
         return $info;
     }
 
+    public function refreshUserMemberInfo(
+        string $userId,
+        string $email
+    ): ?MemberInfo {
+        $this->store?->clearMemberInfo($this, $userId);
+        $this->cache->clearMemberInfo($this, $email);
+
+        return $this->getUserMemberInfo($userId, $email);
+    }
+
     public function getMemberInfo(
         string $email,
     ): ?MemberInfo {
@@ -405,6 +430,13 @@ class Source extends SourceReference
 
         $this->cache->storeMemberInfo($this, $email, $info);
         return $info;
+    }
+
+    public function refreshMemberInfo(
+        string $email
+    ): ?MemberInfo {
+        $this->cache->clearMemberInfo($this, $email);
+        return $this->getMemberInfo($email);
     }
 
     private function newFailureResponse(

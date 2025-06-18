@@ -31,21 +31,12 @@ class Refresh implements Action
     public function execute(
         Request $request
     ): bool {
-        if(!$store = Telegraph::getStore()) {
-            $this->io->error('No store has been configured');
-            return false;
-        }
-
-        $cache = Telegraph::getCache();
         $source = $request->parameters->tryString('source');
         $sources = $this->getSources($source);
 
         foreach($sources as $source) {
             $this->io->{'brightMagenta'}($source->name . ' ');
-            $store->clearListInfo($source);
-            $cache->clearListInfo($source);
-
-            $info = $source->getListInfo();
+            $info = $source->refreshListInfo();
 
             if($info !== null) {
                 $this->io->{'brightYellow'}($info->id . ' ');

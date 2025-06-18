@@ -70,6 +70,12 @@ class Telegraph implements Proxy
     public static function getListInfo(Ref5|string $source): ?Ref7 {
         return static::$_veneerInstance->getListInfo(...func_get_args());
     }
+    public static function refreshListInfo(Ref5|string $source): ?Ref7 {
+        return static::$_veneerInstance->refreshListInfo(...func_get_args());
+    }
+    public static function refreshListInfoAll(): array {
+        return static::$_veneerInstance->refreshListInfoAll();
+    }
     public static function getGroupOptions(Ref5|string $source, bool $forceCategories = false, ?string $noCategoryLabel = NULL): array {
         return static::$_veneerInstance->getGroupOptions(...func_get_args());
     }
@@ -148,10 +154,28 @@ class Telegraph implements Proxy
     public static function getDiscipleMemberInfo(Ref5|string $source): ?Ref12 {
         return static::$_veneerInstance->getDiscipleMemberInfo(...func_get_args());
     }
+    public static function refreshDiscipleMemberInfo(Ref5|string $source): ?Ref12 {
+        return static::$_veneerInstance->refreshDiscipleMemberInfo(...func_get_args());
+    }
+    public static function refreshDiscipleMemberInfoAll(): array {
+        return static::$_veneerInstance->refreshDiscipleMemberInfoAll();
+    }
     public static function getUserMemberInfo(Ref5|string $source, string $userId, string $email): ?Ref12 {
         return static::$_veneerInstance->getUserMemberInfo(...func_get_args());
     }
+    public static function refreshUserMemberInfo(Ref5|string $source, string $userId, string $email): ?Ref12 {
+        return static::$_veneerInstance->refreshUserMemberInfo(...func_get_args());
+    }
+    public static function refreshUserMemberInfoAll(string $userId, string $email): array {
+        return static::$_veneerInstance->refreshUserMemberInfoAll(...func_get_args());
+    }
     public static function getMemberInfo(Ref5|string $source, string $email): ?Ref12 {
         return static::$_veneerInstance->getMemberInfo(...func_get_args());
+    }
+    public static function refreshMemberInfo(Ref5|string $source, string $email): ?Ref12 {
+        return static::$_veneerInstance->refreshMemberInfo(...func_get_args());
+    }
+    public static function refreshMemberInfoAll(string $email): array {
+        return static::$_veneerInstance->refreshMemberInfoAll(...func_get_args());
     }
 };
