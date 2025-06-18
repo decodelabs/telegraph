@@ -40,6 +40,8 @@ class ListInfo extends ListReference implements JsonSerializable
      */
     protected(set) array $tags = [];
 
+    private ?bool $useCategories = null;
+
 
     /**
      * @param array<GroupInfo> $groups
@@ -83,16 +85,24 @@ class ListInfo extends ListReference implements JsonSerializable
     ): array {
         $output = [];
         $categoryNames = [];
-        $useCategory = $forceCategories;
 
-        foreach($this->groups as $group) {
-            $categoryName = $group->categoryName ?? $noCategoryLabel ?? 'No category';
-            $categoryNames[$categoryName] = true;
+        if(
+            !$forceCategories &&
+            $this->useCategories === null
+        ) {
+            $this->useCategories = false;
 
-            if(count($categoryNames) > 1) {
-                $useCategory = true;
+            foreach($this->groups as $group) {
+                $categoryName = $group->categoryName ?? $noCategoryLabel ?? 'No category';
+                $categoryNames[$categoryName] = true;
+
+                if(count($categoryNames) > 1) {
+                    $this->useCategories = true;
+                }
             }
         }
+
+        $useCategory = $forceCategories || $this->useCategories;
 
         foreach($this->groups as $group) {
             $name = $group->name;
@@ -110,6 +120,45 @@ class ListInfo extends ListReference implements JsonSerializable
         asort($output);
         return $output;
     }
+
+    public function getGroupName(
+        string $groupId,
+        bool $forceCategories = false,
+        ?string $noCategoryLabel = null
+    ): ?string {
+        if(null === ($group = $this->groups[$groupId] ?? null)) {
+            return null;
+        }
+
+        $name = $group->name;
+
+        if(
+            !$forceCategories &&
+            $this->useCategories === null
+        ) {
+            $this->useCategories = false;
+            $categoryNames = [];
+
+            foreach($this->groups as $group) {
+                $categoryName = $group->categoryName ?? $noCategoryLabel ?? 'No category';
+                $categoryNames[$categoryName] = true;
+
+                if(count($categoryNames) > 1) {
+                    $this->useCategories = true;
+                }
+            }
+        }
+
+        $useCategory = $forceCategories || $this->useCategories;
+
+        if($useCategory) {
+            $categoryName = $group->categoryName ?? $noCategoryLabel ?? 'No category';
+            return $categoryName . ' / ' . $name;
+        }
+
+        return $name;
+    }
+
 
     /**
      * @return array<string,array<string,string>>
@@ -151,6 +200,30 @@ class ListInfo extends ListReference implements JsonSerializable
         return $output;
     }
 
+    public function getGroupCategoryName(
+        string $categoryId,
+        ?string $noCategoryLabel = null
+    ): string {
+        foreach($this->groups as $group) {
+            if($group->categoryId === $categoryId) {
+                return $group->categoryName ?? $noCategoryLabel ?? $categoryId;
+            }
+        }
+
+        return $categoryId;
+    }
+
+    public function getGroupCategoryNameByGroupId(
+        string $groupId,
+        ?string $noCategoryLabel = null
+    ): ?string {
+        if(null === ($group = $this->groups[$groupId] ?? null)) {
+            return null;
+        }
+
+        return $group->categoryName ?? $noCategoryLabel ?? $group->categoryId;
+    }
+
     /**
      * @return array<string,string>
      */
@@ -164,6 +237,12 @@ class ListInfo extends ListReference implements JsonSerializable
 
         asort($output);
         return $output;
+    }
+
+    public function getTagName(
+        string $tagId
+    ): ?string {
+        return ($this->tags[$tagId] ?? null)?->name;
     }
 
 

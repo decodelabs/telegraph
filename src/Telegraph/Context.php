@@ -16,8 +16,10 @@ use DecodeLabs\Exceptional;
 use DecodeLabs\Monarch;
 use DecodeLabs\Stash;
 use DecodeLabs\Telegraph;
+use DecodeLabs\Telegraph\Source\GroupInfo;
 use DecodeLabs\Telegraph\Source\ListInfo;
 use DecodeLabs\Telegraph\Source\MemberInfo;
+use DecodeLabs\Telegraph\Source\TagInfo;
 use DecodeLabs\Veneer;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -268,6 +270,22 @@ class Context
         return $this->getListInfo($source)?->getCategorizedGroupOptions($noCategoryLabel) ?? [];
     }
 
+    public function getGroup(
+        string|SourceReference $source,
+        string $groupId
+    ): ?GroupInfo {
+        return $this->getListInfo($source)?->groups[$groupId] ?? null;
+    }
+
+    public function getGroupName(
+        string|SourceReference $source,
+        string $groupId,
+        bool $forceCategories = false,
+        ?string $noCategoryLabel = null
+    ): ?string {
+        return $this->getListInfo($source)?->getGroupName($groupId, $forceCategories, $noCategoryLabel);
+    }
+
     /**
      * @return array<string,string>
      */
@@ -277,6 +295,22 @@ class Context
         return $this->getListInfo($source)?->getGroupCategoryOptions() ?? [];
     }
 
+    public function getGroupCategoryName(
+        string|SourceReference $source,
+        string $groupId,
+        ?string $noCategoryLabel = null
+    ): ?string {
+        return $this->getListInfo($source)?->getGroupCategoryName($groupId, $noCategoryLabel);
+    }
+
+    public function getGroupCategoryNameByGroupId(
+        string|SourceReference $source,
+        string $groupId,
+        ?string $noCategoryLabel = null
+    ): ?string {
+        return $this->getListInfo($source)?->getGroupCategoryNameByGroupId($groupId, $noCategoryLabel);
+    }
+
     /**
      * @return array<string,string>
      */
@@ -284,6 +318,20 @@ class Context
         string|SourceReference $source
     ): array {
         return $this->getListInfo($source)?->getTagOptions() ?? [];
+    }
+
+    public function getTag(
+        string|SourceReference $source,
+        string $tagId
+    ): ?TagInfo {
+        return $this->getListInfo($source)?->tags[$tagId] ?? null;
+    }
+
+    public function getTagName(
+        string|SourceReference $source,
+        string $tagId
+    ): ?string {
+        return $this->getListInfo($source)?->getTagName($tagId);
     }
 
     public function subscribeDisciple(

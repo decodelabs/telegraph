@@ -11,8 +11,10 @@ namespace DecodeLabs\Telegraph;
 
 use DecodeLabs\Disciple;
 use DecodeLabs\Exceptional;
+use DecodeLabs\Telegraph\Source\GroupInfo;
 use DecodeLabs\Telegraph\Source\ListInfo;
 use DecodeLabs\Telegraph\Source\MemberInfo;
+use DecodeLabs\Telegraph\Source\TagInfo;
 
 class Source extends SourceReference
 {
@@ -73,12 +75,40 @@ class Source extends SourceReference
         return $this->getListInfo()?->getCategorizedGroupOptions($noCategoryLabel) ?? [];
     }
 
+    public function getGroup(
+        string $groupId
+    ): ?GroupInfo {
+        return $this->getListInfo()?->groups[$groupId] ?? null;
+    }
+
+    public function getGroupName(
+        string $groupId,
+        bool $forceCategories = false,
+        ?string $noCategoryLabel = null
+    ): ?string {
+        return $this->getListInfo()?->getGroupName($groupId, $forceCategories, $noCategoryLabel);
+    }
+
     /**
      * @return array<string,string>
      */
     public function getGroupCategoryOptions(): array
     {
         return $this->getListInfo()?->getGroupCategoryOptions() ?? [];
+    }
+
+    public function getGroupCategoryName(
+        string $groupId,
+        ?string $noCategoryLabel = null
+    ): ?string {
+        return $this->getListInfo()?->getGroupCategoryName($groupId, $noCategoryLabel);
+    }
+
+    public function getGroupCategoryNameByGroupId(
+        string $groupId,
+        ?string $noCategoryLabel = null
+    ): ?string {
+        return $this->getListInfo()?->getGroupCategoryNameByGroupId($groupId, $noCategoryLabel);
     }
 
     /**
@@ -89,7 +119,17 @@ class Source extends SourceReference
         return $this->getListInfo()?->getTagOptions() ?? [];
     }
 
+    public function getTag(
+        string $tagId
+    ): ?TagInfo {
+        return $this->getListInfo()?->tags[$tagId] ?? null;
+    }
 
+    public function getTagName(
+        string $tagId
+    ): ?string {
+        return $this->getListInfo()?->getTagName($tagId);
+    }
 
     public function subscribeDisciple(
         ?MemberDataRequest $request = null
