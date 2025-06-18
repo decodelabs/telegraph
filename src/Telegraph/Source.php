@@ -61,12 +61,11 @@ class Source extends SourceReference
     {
         if($info = $this->adapter->fetchListInfo($this)) {
             $this->store?->storeListInfo($this, $info);
-            $this->cache->storeListInfo($this, $info);
         } else {
             $this->store?->clearListInfo($this);
-            $this->cache->clearListInfo($this);
         }
 
+        $this->cache->storeListInfo($this, $info);
         return $info;
     }
 
@@ -454,15 +453,13 @@ class Source extends SourceReference
             return null;
         }
 
-        $info = $this->adapter->fetchMemberInfo(
-            $this,
-            $listInfo,
-            $email,
-        );
+        if($info = $this->adapter->fetchMemberInfo($this, $listInfo, $email)) {
+            $this->store?->storeMemberInfo($this, $userId, $info);
+        } else {
+            $this->store?->clearMemberInfo($this, $userId);
+        }
 
-        $this->store?->storeMemberInfo($this, $userId, $info);
         $this->cache->storeMemberInfo($this, $email, $info);
-
         return $this->checkMemberSubscribed($info);
     }
 
