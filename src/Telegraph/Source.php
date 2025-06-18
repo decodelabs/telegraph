@@ -193,7 +193,11 @@ class Source extends SourceReference
             return $this->newFailureResponse();
         }
 
-        $result = $this->adapter->subscribe($this, $listInfo, $request);
+        if($this->isUserSubscribed($userId, $request->email)) {
+            $result = $this->adapter->update($this, $listInfo, $request->email, $request);
+        } else {
+            $result = $this->adapter->subscribe($this, $listInfo, $request);
+        }
 
         if($result->response->success) {
             if($result->memberInfo !== null) {
