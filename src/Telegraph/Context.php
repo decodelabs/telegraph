@@ -452,7 +452,9 @@ class Context
         $output = [];
 
         foreach($this->loadAll() as $source) {
-            $output[$source->name] = $this->updateDisciple($source, $request);
+            if($source->isDiscipleSubscribed()) {
+                $output[$source->name] = $source->updateDisciple($request);
+            }
         }
 
         return $output;
@@ -469,7 +471,9 @@ class Context
         $output = [];
 
         foreach($this->loadAll() as $source) {
-            $output[$source->name] = $this->updateUser($source, $userId, $email, $request);
+            if($source->isUserSubscribed($userId, $email)) {
+                $output[$source->name] = $source->updateUser($userId, $email, $request);
+            }
         }
 
         return $output;
@@ -485,7 +489,9 @@ class Context
         $output = [];
 
         foreach($this->loadAll() as $source) {
-            $output[$source->name] = $this->update($source, $email, $request);
+            if($source->isSubscribed($email)) {
+                $output[$source->name] = $source->update($email, $request);
+            }
         }
 
         return $output;
