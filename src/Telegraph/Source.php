@@ -54,6 +54,43 @@ class Source extends SourceReference
         return $info;
     }
 
+    /**
+     * @return array<string,string>
+     */
+    public function getGroupOptions(
+        bool $forceCategories = false,
+        ?string $noCategoryLabel = null
+    ): array {
+        return $this->getListInfo()?->getGroupOptions($forceCategories, $noCategoryLabel) ?? [];
+    }
+
+    /**
+     * @return array<string,array<string,string>>
+     */
+    public function getCategorizedGroupOptions(
+        ?string $noCategoryLabel = null
+    ): array {
+        return $this->getListInfo()?->getCategorizedGroupOptions($noCategoryLabel) ?? [];
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getGroupCategoryOptions(): array
+    {
+        return $this->getListInfo()?->getGroupCategoryOptions() ?? [];
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getTagOptions(): array
+    {
+        return $this->getListInfo()?->getTagOptions() ?? [];
+    }
+
+
+
     public function subscribeDisciple(
         ?MemberDataRequest $request = null
     ): SubscriptionResponse {

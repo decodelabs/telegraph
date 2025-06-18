@@ -77,14 +77,16 @@ class ListInfo extends ListReference implements JsonSerializable
     /**
      * @return array<string,string>
      */
-    public function getGroupOptions(): array
-    {
+    public function getGroupOptions(
+        bool $forceCategories = false,
+        ?string $noCategoryLabel = null
+    ): array {
         $output = [];
         $categoryNames = [];
-        $useCategory = false;
+        $useCategory = $forceCategories;
 
         foreach($this->groups as $group) {
-            $categoryName = $group->categoryName ?? 'No category';
+            $categoryName = $group->categoryName ?? $noCategoryLabel ?? 'No category';
             $categoryNames[$categoryName] = true;
 
             if(count($categoryNames) > 1) {
@@ -112,12 +114,13 @@ class ListInfo extends ListReference implements JsonSerializable
     /**
      * @return array<string,array<string,string>>
      */
-    public function getCategorizedGroupOptions(): array
-    {
+    public function getCategorizedGroupOptions(
+        ?string $noCategoryLabel = null
+    ): array {
         $output = [];
 
         foreach($this->groups as $group) {
-            $categoryName = $group->categoryName ?? 'No category';
+            $categoryName = $group->categoryName ?? $noCategoryLabel ?? 'No category';
             $output[$categoryName][$group->id] = $group->name;
         }
 

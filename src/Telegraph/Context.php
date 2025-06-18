@@ -246,6 +246,46 @@ class Context
         return $this->load($source)?->getListInfo();
     }
 
+
+    /**
+     * @return array<string,string>
+     */
+    public function getGroupOptions(
+        string|SourceReference $source,
+        bool $forceCategories = false,
+        ?string $noCategoryLabel = null
+    ): array {
+        return $this->getListInfo($source)?->getGroupOptions($forceCategories, $noCategoryLabel) ?? [];
+    }
+
+    /**
+     * @return array<string,array<string,string>>
+     */
+    public function getCategorizedGroupOptions(
+        string|SourceReference $source,
+        ?string $noCategoryLabel = null
+    ): array {
+        return $this->getListInfo($source)?->getCategorizedGroupOptions($noCategoryLabel) ?? [];
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getGroupCategoryOptions(
+        string|SourceReference $source
+    ): array {
+        return $this->getListInfo($source)?->getGroupCategoryOptions() ?? [];
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getTagOptions(
+        string|SourceReference $source
+    ): array {
+        return $this->getListInfo($source)?->getTagOptions() ?? [];
+    }
+
     public function subscribeDisciple(
         string|SourceReference $source,
         ?MemberDataRequest $request = null

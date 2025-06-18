@@ -68,6 +68,18 @@ class Telegraph implements Proxy
     public static function getListInfo(Ref5|string $source): ?Ref7 {
         return static::$_veneerInstance->getListInfo(...func_get_args());
     }
+    public static function getGroupOptions(Ref5|string $source, bool $forceCategories = false, ?string $noCategoryLabel = NULL): array {
+        return static::$_veneerInstance->getGroupOptions(...func_get_args());
+    }
+    public static function getCategorizedGroupOptions(Ref5|string $source, ?string $noCategoryLabel = NULL): array {
+        return static::$_veneerInstance->getCategorizedGroupOptions(...func_get_args());
+    }
+    public static function getGroupCategoryOptions(Ref5|string $source): array {
+        return static::$_veneerInstance->getGroupCategoryOptions(...func_get_args());
+    }
+    public static function getTagOptions(Ref5|string $source): array {
+        return static::$_veneerInstance->getTagOptions(...func_get_args());
+    }
     public static function subscribeDisciple(Ref5|string $source, ?Ref8 $request = NULL): Ref9 {
         return static::$_veneerInstance->subscribeDisciple(...func_get_args());
     }
