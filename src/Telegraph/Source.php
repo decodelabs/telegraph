@@ -233,6 +233,75 @@ class Source extends SourceReference
         return $result->response;
     }
 
+
+    public function isDiscipleSubscribed(
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null
+    ): bool {
+        return $this->isUserSubscribed(
+            userId: Disciple::getActiveId(),
+            email: (string)Disciple::getEmail(),
+            group: $group,
+            tag: $tag
+        );
+    }
+
+    public function isUserSubscribed(
+        string $userId,
+        string $email,
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null
+    ): bool {
+        $info = $this->getUserMemberInfo(
+            userId: $userId,
+            email: $email
+        );
+
+        return $this->isMemberSubscribed($info, $group, $tag);
+    }
+
+    public function isSubscribed(
+        string $email,
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null
+    ): bool {
+        $info = $this->getMemberInfo($email);
+        return $this->isMemberSubscribed($info, $group, $tag);
+    }
+
+    private function isMemberSubscribed(
+        ?MemberInfo $info,
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null
+    ): bool {
+        if($info === null) {
+            return false;
+        }
+
+        if($group instanceof GroupInfo) {
+            $group = $group->id;
+        }
+
+        if($tag instanceof TagInfo) {
+            $tag = $tag->id;
+        }
+
+        if($group !== null) {
+            if(!isset($info->groups[$group])) {
+                return false;
+            }
+        }
+
+        if($tag !== null) {
+            if(!isset($info->tags[$tag])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
     public function updateDisciple(
         MemberDataRequest $request
     ): SubscriptionResponse {

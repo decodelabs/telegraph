@@ -382,6 +382,37 @@ class Context
             ?? $this->newFailureResponse($source);
     }
 
+    public function isDiscipleSubscribed(
+        string|SourceReference $source,
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null
+    ): bool {
+        return $this->load($source)?->isDiscipleSubscribed($group, $tag) ?? false;
+    }
+
+    public function isUserSubscribed(
+        string|SourceReference $source,
+        string $userId,
+        string $email,
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null
+    ): bool {
+        return $this->load($source)?->isUserSubscribed($userId, $email, $group, $tag) ?? false;
+    }
+
+    public function isSubscribed(
+        string|SourceReference $source,
+        string $email,
+        string|GroupInfo|null $group = null,
+        string|TagInfo|null $tag = null
+    ): bool {
+        return $this->load($source)?->isSubscribed($email, $group, $tag) ?? false;
+    }
+
+
+
+
+
     public function updateDisciple(
         string|SourceReference $source,
         MemberDataRequest $request

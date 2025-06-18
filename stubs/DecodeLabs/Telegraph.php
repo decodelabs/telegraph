@@ -115,6 +115,15 @@ class Telegraph implements Proxy
     public static function subscribe(Ref5|string $source, Ref10 $request): Ref11 {
         return static::$_veneerInstance->subscribe(...func_get_args());
     }
+    public static function isDiscipleSubscribed(Ref5|string $source, Ref8|string|null $group = NULL, Ref9|string|null $tag = NULL): bool {
+        return static::$_veneerInstance->isDiscipleSubscribed(...func_get_args());
+    }
+    public static function isUserSubscribed(Ref5|string $source, string $userId, string $email, Ref8|string|null $group = NULL, Ref9|string|null $tag = NULL): bool {
+        return static::$_veneerInstance->isUserSubscribed(...func_get_args());
+    }
+    public static function isSubscribed(Ref5|string $source, string $email, Ref8|string|null $group = NULL, Ref9|string|null $tag = NULL): bool {
+        return static::$_veneerInstance->isSubscribed(...func_get_args());
+    }
     public static function updateDisciple(Ref5|string $source, Ref10 $request): Ref11 {
         return static::$_veneerInstance->updateDisciple(...func_get_args());
     }
