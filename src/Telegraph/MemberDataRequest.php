@@ -107,13 +107,13 @@ class MemberDataRequest
             $this->setGroupIntent($id, $intent);
         }
 
-        foreach($tags as $name => $intent) {
+        foreach($tags as $id => $intent) {
             if(is_string($intent)) {
-                $name = $intent;
+                $id = $intent;
                 $intent = true;
             }
 
-            $this->setTagIntent($name, $intent);
+            $this->setTagIntent((string)$id, $intent);
         }
     }
 
@@ -163,43 +163,43 @@ class MemberDataRequest
 
 
     public function addTag(
-        string $name
+        string $id
     ): void {
-        $this->tags[$name] = true;
+        $this->tags[$id] = true;
     }
 
     public function removeTag(
-        string $name
+        string $id
     ): void {
-        $this->tags[$name] = false;
+        $this->tags[$id] = false;
     }
 
     public function setTagIntent(
-        string $name,
+        string $id,
         ?bool $intent
     ): void {
         match($intent) {
-            true => $this->addTag($name),
-            false => $this->removeTag($name),
-            default => $this->unsetTag($name)
+            true => $this->addTag($id),
+            false => $this->removeTag($id),
+            default => $this->unsetTag($id)
         };
     }
 
     public function getTagIntent(
-        string $name
+        string $id
     ): ?bool {
-        return $this->tags[$name] ?? null;
+        return $this->tags[$id] ?? null;
     }
 
     public function hasTag(
-        string $name
+        string $id
     ): bool {
-        return isset($this->tags[$name]);
+        return isset($this->tags[$id]);
     }
 
     public function unsetTag(
-        string $name
+        string $id
     ): void {
-        unset($this->tags[$name]);
+        unset($this->tags[$id]);
     }
 }
