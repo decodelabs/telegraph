@@ -32,7 +32,7 @@ class Info implements Action
     ): bool {
         $info = Telegraph::getListInfo($request->parameters->asString('source'));
 
-        if(!$info) {
+        if (!$info) {
             $this->io->error('No list info found');
             return false;
         }
@@ -43,20 +43,20 @@ class Info implements Action
 
         $this->io->{'.red'}($info->subscribeUrl);
 
-        if(!empty($info->groups)) {
+        if (!empty($info->groups)) {
             $this->io->{'.blue'}('Groups:');
         }
 
-        foreach($info->groups as $group) {
+        foreach ($info->groups as $group) {
             $this->io->{'>brightYellow'}($group->id . ' ');
             $this->io->{'.white'}($group->name);
         }
 
-        if(!empty($info->tags)) {
+        if (!empty($info->tags)) {
             $this->io->{'.blue'}('Tags:');
         }
 
-        foreach($info->tags as $tag) {
+        foreach ($info->tags as $tag) {
             $this->io->{'>brightYellow'}($tag->id . ' ');
             $this->io->{'.white'}($tag->name);
         }

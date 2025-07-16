@@ -34,11 +34,11 @@ use JsonSerializable;
  */
 class MemberInfo implements JsonSerializable
 {
-    protected(set) string $id;
-    protected(set) string $email;
-    protected(set) MemberStatus $status;
+    public protected(set) string $id;
+    public protected(set) string $email;
+    public protected(set) MemberStatus $status;
 
-    protected(set) CarbonImmutable $fetchDate {
+    public protected(set) CarbonImmutable $fetchDate {
         set(?DateTimeInterface $value) {
             $this->fetchDate = $value ?
                 CarbonImmutable::instance($value) :
@@ -46,7 +46,7 @@ class MemberInfo implements JsonSerializable
         }
     }
 
-    protected(set) ?CarbonImmutable $creationDate = null {
+    public protected(set) ?CarbonImmutable $creationDate = null {
         set(?DateTimeInterface $value) {
             $this->creationDate = $value ?
                 CarbonImmutable::instance($value) :
@@ -54,21 +54,21 @@ class MemberInfo implements JsonSerializable
         }
     }
 
-    protected(set) ?string $firstName = null;
-    protected(set) ?string $lastName = null;
-    protected(set) ?string $country = null;
-    protected(set) ?string $language = null;
-    protected(set) ?EmailType $emailType = null;
+    public protected(set) ?string $firstName = null;
+    public protected(set) ?string $lastName = null;
+    public protected(set) ?string $country = null;
+    public protected(set) ?string $language = null;
+    public protected(set) ?EmailType $emailType = null;
 
     /**
      * @var array<GroupInfo>
      */
-    protected(set) array $groups = [];
+    public protected(set) array $groups = [];
 
     /**
      * @var array<TagInfo>
      */
-    protected(set) array $tags = [];
+    public protected(set) array $tags = [];
 
     /**
      * @param array<GroupInfo> $groups
@@ -99,11 +99,11 @@ class MemberInfo implements JsonSerializable
         $this->language = $language;
         $this->emailType = $emailType;
 
-        foreach($groups as $group) {
+        foreach ($groups as $group) {
             $this->groups[$group->id] = $group;
         }
 
-        foreach($tags as $tag) {
+        foreach ($tags as $tag) {
             $this->tags[$tag->id] = $tag;
         }
     }
@@ -126,11 +126,11 @@ class MemberInfo implements JsonSerializable
             language: Coercion::tryString($data['language'] ?? null),
             emailType: EmailType::tryFrom(Coercion::toString($data['emailType'] ?? '')),
             groups: array_map(
-                fn($group) => GroupInfo::fromArray(Coercion::asArray($group)),
+                fn ($group) => GroupInfo::fromArray(Coercion::asArray($group)),
                 Coercion::asArray($data['groups'] ?? [])
             ),
             tags: array_map(
-                fn($tag) => TagInfo::fromArray(Coercion::asArray($tag)),
+                fn ($tag) => TagInfo::fromArray(Coercion::asArray($tag)),
                 Coercion::asArray($data['tags'] ?? [])
             ),
         );
@@ -139,7 +139,8 @@ class MemberInfo implements JsonSerializable
     /**
      * @return MemberInfoArray
      */
-    public function jsonSerialize(): array {
+    public function jsonSerialize(): array
+    {
         return [
             'id' => $this->id,
             'email' => $this->email,
@@ -152,11 +153,11 @@ class MemberInfo implements JsonSerializable
             'language' => $this->language,
             'emailType' => $this->emailType?->value,
             'groups' => array_map(
-                fn(GroupInfo $group) => $group->jsonSerialize(),
+                fn (GroupInfo $group) => $group->jsonSerialize(),
                 $this->groups
             ),
             'tags' => array_map(
-                fn(TagInfo $tag) => $tag->jsonSerialize(),
+                fn (TagInfo $tag) => $tag->jsonSerialize(),
                 $this->tags
             ),
         ];

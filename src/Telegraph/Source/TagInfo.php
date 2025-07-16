@@ -20,8 +20,8 @@ use JsonSerializable;
  */
 class TagInfo implements JsonSerializable
 {
-    protected(set) string $id;
-    protected(set) string $name;
+    public protected(set) string $id;
+    public protected(set) string $name;
 
     public function __construct(
         string $id,
@@ -46,7 +46,8 @@ class TagInfo implements JsonSerializable
     /**
      * @return TagInfoArray
      */
-    public function jsonSerialize(): array {
+    public function jsonSerialize(): array
+    {
         return [
             'id' => $this->id,
             'name' => $this->name,

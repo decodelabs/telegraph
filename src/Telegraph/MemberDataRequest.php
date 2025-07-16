@@ -45,7 +45,7 @@ class MemberDataRequest
             if (empty($value)) {
                 $this->country = null;
             } else {
-                if(strlen($value) !== 2) {
+                if (strlen($value) !== 2) {
                     throw Exceptional::InvalidArgument(
                         'Country code must be a 2-letter ISO code'
                     );
@@ -71,12 +71,12 @@ class MemberDataRequest
     /**
      * @var array<string,bool>
      */
-    protected(set) array $groups = [];
+    public protected(set) array $groups = [];
 
     /**
      * @var array<string,bool>
      */
-    protected(set) array $tags = [];
+    public protected(set) array $tags = [];
 
 
     /**
@@ -98,8 +98,8 @@ class MemberDataRequest
         $this->country = $country;
         $this->language = $language;
 
-        foreach($groups as $id => $intent) {
-            if(is_string($intent)) {
+        foreach ($groups as $id => $intent) {
+            if (is_string($intent)) {
                 $id = $intent;
                 $intent = true;
             }
@@ -107,8 +107,8 @@ class MemberDataRequest
             $this->setGroupIntent($id, $intent);
         }
 
-        foreach($tags as $id => $intent) {
-            if(is_string($intent)) {
+        foreach ($tags as $id => $intent) {
+            if (is_string($intent)) {
                 $id = $intent;
                 $intent = true;
             }
@@ -136,7 +136,7 @@ class MemberDataRequest
         string $id,
         ?bool $intent
     ): void {
-        match($intent) {
+        match ($intent) {
             true => $this->addGroup($id),
             false => $this->removeGroup($id),
             default => $this->unsetGroup($id)
@@ -178,7 +178,7 @@ class MemberDataRequest
         string $id,
         ?bool $intent
     ): void {
-        match($intent) {
+        match ($intent) {
             true => $this->addTag($id),
             false => $this->removeTag($id),
             default => $this->unsetTag($id)

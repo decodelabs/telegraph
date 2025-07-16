@@ -33,7 +33,7 @@ class Cache
         SourceReference $source,
         ?ListInfo $list
     ): void {
-        if(!$this->driver) {
+        if (!$this->driver) {
             return;
         }
 
@@ -47,7 +47,7 @@ class Cache
     ): ListInfo|false|null {
         $output = $this->driver?->getItem($source->name)->get();
 
-        if(
+        if (
             $output === null ||
             $output === false ||
             $output instanceof ListInfo
@@ -69,7 +69,7 @@ class Cache
         string $email,
         ?MemberInfo $member
     ): void {
-        if(!$this->driver) {
+        if (!$this->driver) {
             return;
         }
 
@@ -87,7 +87,7 @@ class Cache
         $hash = md5($email);
         $output = $this->driver?->getItem($source->name . '|' . $hash)->get();
 
-        if(
+        if (
             $output === null ||
             $output === false ||
             $output instanceof MemberInfo

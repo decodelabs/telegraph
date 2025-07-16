@@ -19,9 +19,9 @@ use DecodeLabs\Telegraph\Source\TagInfo;
 
 class Source extends SourceReference
 {
-    protected(set) Adapter $adapter;
-    protected(set) Cache $cache;
-    protected(set) ?Store $store = null;
+    public protected(set) Adapter $adapter;
+    public protected(set) Cache $cache;
+    public protected(set) ?Store $store = null;
 
     public function __construct(
         string $name,
@@ -38,15 +38,15 @@ class Source extends SourceReference
 
     public function getListInfo(): ?ListInfo
     {
-        if(null !== ($info = $this->cache->fetchListInfo($this))) {
-            if($info === false) {
+        if (null !== ($info = $this->cache->fetchListInfo($this))) {
+            if ($info === false) {
                 return null;
             }
 
             return $info;
         }
 
-        if(
+        if (
             (!$info = $this->store?->fetchListInfo($this)) &&
             ($info = $this->adapter->fetchListInfo($this))
         ) {
@@ -59,7 +59,7 @@ class Source extends SourceReference
 
     public function refreshListInfo(): ?ListInfo
     {
-        if($info = $this->adapter->fetchListInfo($this)) {
+        if ($info = $this->adapter->fetchListInfo($this)) {
             $this->store?->storeListInfo($this, $info);
         } else {
             $this->store?->clearListInfo($this);
@@ -147,33 +147,33 @@ class Source extends SourceReference
     public function subscribeDisciple(
         ?MemberDataRequest $request = null
     ): SubscriptionResponse {
-        if(!class_exists(Disciple::class)) {
+        if (!class_exists(Disciple::class)) {
             throw Exceptional::ComponentUnavailable(
                 'Disciple package is not installed'
             );
         }
 
-        if($request === null) {
+        if ($request === null) {
             $request = new MemberDataRequest();
         }
 
-        if($request->email === null) {
+        if ($request->email === null) {
             $request->email = Disciple::getEmail();
         }
 
-        if($request->firstName === null) {
+        if ($request->firstName === null) {
             $request->firstName = Disciple::getFirstName();
         }
 
-        if($request->lastName === null) {
+        if ($request->lastName === null) {
             $request->lastName = Disciple::getSurname();
         }
 
-        if($request->country === null) {
+        if ($request->country === null) {
             $request->country = Disciple::getCountry();
         }
 
-        if($request->language === null) {
+        if ($request->language === null) {
             $request->language = Disciple::getLanguage();
         }
 
@@ -187,24 +187,24 @@ class Source extends SourceReference
         string $userId,
         MemberDataRequest $request
     ): SubscriptionResponse {
-        if($request->email === null) {
+        if ($request->email === null) {
             throw Exceptional::InvalidArgument(
                 'Email address is required'
             );
         }
 
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return $this->newFailureResponse();
         }
 
-        if($this->isUserSubscribed($userId, $request->email)) {
+        if ($this->isUserSubscribed($userId, $request->email)) {
             $result = $this->adapter->update($this, $listInfo, $request->email, $request);
         } else {
             $result = $this->adapter->subscribe($this, $listInfo, $request);
         }
 
-        if($result->response->success) {
-            if($result->memberInfo !== null) {
+        if ($result->response->success) {
+            if ($result->memberInfo !== null) {
                 $this->cache->storeMemberInfo($this, $request->email, $result->memberInfo);
                 $this->store?->storeMemberInfo($this, $userId, $result->memberInfo);
             } else {
@@ -219,20 +219,20 @@ class Source extends SourceReference
     public function subscribe(
         MemberDataRequest $request
     ): SubscriptionResponse {
-        if($request->email === null) {
+        if ($request->email === null) {
             throw Exceptional::InvalidArgument(
                 'Email address is required'
             );
         }
 
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return $this->newFailureResponse();
         }
 
         $result = $this->adapter->subscribe($this, $listInfo, $request);
 
-        if($result->response->success) {
-            if($result->memberInfo !== null) {
+        if ($result->response->success) {
+            if ($result->memberInfo !== null) {
                 $this->cache->storeMemberInfo($this, $request->email, $result->memberInfo);
             } else {
                 $this->cache->clearMemberInfo($this, $request->email);
@@ -281,7 +281,7 @@ class Source extends SourceReference
     public function updateDisciple(
         MemberDataRequest $request
     ): SubscriptionResponse {
-        if(!class_exists(Disciple::class)) {
+        if (!class_exists(Disciple::class)) {
             throw Exceptional::ComponentUnavailable(
                 'Disciple package is not installed'
             );
@@ -299,14 +299,14 @@ class Source extends SourceReference
         string $email,
         MemberDataRequest $request
     ): SubscriptionResponse {
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return $this->newFailureResponse();
         }
 
         $result = $this->adapter->update($this, $listInfo, $email, $request);
 
-        if($result->response->success) {
-            if($result->memberInfo !== null) {
+        if ($result->response->success) {
+            if ($result->memberInfo !== null) {
                 $this->cache->storeMemberInfo($this, $email, $result->memberInfo);
                 $this->store?->storeMemberInfo($this, $userId, $result->memberInfo);
             } else {
@@ -322,14 +322,14 @@ class Source extends SourceReference
         string $email,
         MemberDataRequest $request
     ): SubscriptionResponse {
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return $this->newFailureResponse();
         }
 
         $result = $this->adapter->update($this, $listInfo, $email, $request);
 
-        if($result->response->success) {
-            if($result->memberInfo !== null) {
+        if ($result->response->success) {
+            if ($result->memberInfo !== null) {
                 $this->cache->storeMemberInfo($this, $email, $result->memberInfo);
             } else {
                 $this->cache->clearMemberInfo($this, $email);
@@ -341,7 +341,7 @@ class Source extends SourceReference
 
     public function unsubscribeDisciple(): SubscriptionResponse
     {
-        if(!class_exists(Disciple::class)) {
+        if (!class_exists(Disciple::class)) {
             throw Exceptional::ComponentUnavailable(
                 'Disciple package is not installed'
             );
@@ -357,13 +357,13 @@ class Source extends SourceReference
         string $userId,
         string $email
     ): SubscriptionResponse {
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return $this->newFailureResponse();
         }
 
         $result = $this->adapter->unsubscribe($this, $listInfo, $email);
 
-        if($result->response->success) {
+        if ($result->response->success) {
             $this->cache->clearMemberInfo($this, $email);
             $this->store?->clearMemberInfo($this, $userId);
         }
@@ -374,13 +374,13 @@ class Source extends SourceReference
     public function unsubscribe(
         string $email
     ): SubscriptionResponse {
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return $this->newFailureResponse();
         }
 
         $result = $this->adapter->unsubscribe($this, $listInfo, $email);
 
-        if($result->response->success) {
+        if ($result->response->success) {
             $this->cache->clearMemberInfo($this, $email);
         }
 
@@ -390,7 +390,7 @@ class Source extends SourceReference
     public function getDiscipleMemberInfo(
         bool $force = false
     ): ?MemberInfo {
-        if(!class_exists(Disciple::class)) {
+        if (!class_exists(Disciple::class)) {
             throw Exceptional::ComponentUnavailable(
                 'Disciple package is not installed'
             );
@@ -403,7 +403,8 @@ class Source extends SourceReference
         );
     }
 
-    public function refreshDiscipleMemberInfo(): ?MemberInfo {
+    public function refreshDiscipleMemberInfo(): ?MemberInfo
+    {
         return $this->refreshUserMemberInfo(
             Disciple::getActiveId(),
             (string)Disciple::getEmail()
@@ -415,22 +416,22 @@ class Source extends SourceReference
         string $email,
         bool $force = false
     ): ?MemberInfo {
-        if(null !== ($info = $this->cache->fetchMemberInfo($this, $email))) {
-            if($info === false) {
+        if (null !== ($info = $this->cache->fetchMemberInfo($this, $email))) {
+            if ($info === false) {
                 return null;
             }
 
             return $this->checkMemberSubscribed($info, force: $force);
         }
 
-        if($info = $this->store?->fetchMemberInfo($this, $userId)) {
+        if ($info = $this->store?->fetchMemberInfo($this, $userId)) {
             $email = $info->email;
         } else {
-            if(!$listInfo = $this->getListInfo()) {
+            if (!$listInfo = $this->getListInfo()) {
                 return null;
             }
 
-            if(
+            if (
                 $info = $this->adapter->fetchMemberInfo(
                     $this,
                     $listInfo,
@@ -449,11 +450,11 @@ class Source extends SourceReference
         string $userId,
         string $email
     ): ?MemberInfo {
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return null;
         }
 
-        if($info = $this->adapter->fetchMemberInfo($this, $listInfo, $email)) {
+        if ($info = $this->adapter->fetchMemberInfo($this, $listInfo, $email)) {
             $this->store?->storeMemberInfo($this, $userId, $info);
         } else {
             $this->store?->clearMemberInfo($this, $userId);
@@ -467,15 +468,15 @@ class Source extends SourceReference
         string $email,
         bool $force = false
     ): ?MemberInfo {
-        if(null !== ($info = $this->cache->fetchMemberInfo($this, $email))) {
-            if($info === false) {
+        if (null !== ($info = $this->cache->fetchMemberInfo($this, $email))) {
+            if ($info === false) {
                 return null;
             }
 
             return $this->checkMemberSubscribed($info, force: $force);
         }
 
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return null;
         }
 
@@ -492,7 +493,7 @@ class Source extends SourceReference
     public function refreshMemberInfo(
         string $email
     ): ?MemberInfo {
-        if(!$listInfo = $this->getListInfo()) {
+        if (!$listInfo = $this->getListInfo()) {
             return null;
         }
 
@@ -511,29 +512,29 @@ class Source extends SourceReference
         string|GroupInfo|null $group = null,
         string|TagInfo|null $tag = null
     ): bool {
-        if(
+        if (
             $info === null ||
             $info->status !== MemberStatus::Subscribed
         ) {
             return false;
         }
 
-        if($group instanceof GroupInfo) {
+        if ($group instanceof GroupInfo) {
             $group = $group->id;
         }
 
-        if($tag instanceof TagInfo) {
+        if ($tag instanceof TagInfo) {
             $tag = $tag->id;
         }
 
-        if($group !== null) {
-            if(!isset($info->groups[$group])) {
+        if ($group !== null) {
+            if (!isset($info->groups[$group])) {
                 return false;
             }
         }
 
-        if($tag !== null) {
-            if(!isset($info->tags[$tag])) {
+        if ($tag !== null) {
+            if (!isset($info->tags[$tag])) {
                 return false;
             }
         }
@@ -547,7 +548,7 @@ class Source extends SourceReference
         string|TagInfo|null $tag = null,
         bool $force = false
     ): ?MemberInfo {
-        if($this->isMemberSubscribed($info, $group, $tag)) {
+        if ($this->isMemberSubscribed($info, $group, $tag)) {
             return $info;
         }
 

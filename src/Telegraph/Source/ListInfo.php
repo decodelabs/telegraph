@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Telegraph\Source;
 
-use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use DecodeLabs\Coercion;
 use JsonSerializable;
@@ -33,27 +32,27 @@ class ListInfo extends ListReference implements JsonSerializable
     /**
      * @var array<string,GroupInfo>
      */
-    protected(set) array $groups = [];
+    public protected(set) array $groups = [];
 
     /**
      * @var array<string,TagInfo>
      */
-    protected(set) array $tags = [];
+    public protected(set) array $tags = [];
 
     private bool $useCategories {
         get {
-            if(isset($this->useCategories)) {
+            if (isset($this->useCategories)) {
                 return $this->useCategories;
             }
 
             $this->useCategories = false;
             $categoryNames = [];
 
-            foreach($this->groups as $testGroup) {
+            foreach ($this->groups as $testGroup) {
                 $categoryName = $testGroup->categoryName ?? '--none--';
                 $categoryNames[$categoryName] = true;
 
-                if(count($categoryNames) > 1) {
+                if (count($categoryNames) > 1) {
                     $this->useCategories = true;
                     break;
                 }
@@ -87,11 +86,11 @@ class ListInfo extends ListReference implements JsonSerializable
             memberCount: $memberCount
         );
 
-        foreach($groups as $group) {
+        foreach ($groups as $group) {
             $this->groups[$group->id] = $group;
         }
 
-        foreach($tags as $tag) {
+        foreach ($tags as $tag) {
             $this->tags[$tag->id] = $tag;
         }
     }
@@ -107,10 +106,10 @@ class ListInfo extends ListReference implements JsonSerializable
         $output = [];
         $useCategory = $forceCategories || $this->useCategories;
 
-        foreach($this->groups as $group) {
+        foreach ($this->groups as $group) {
             $name = $group->name;
 
-            if($useCategory) {
+            if ($useCategory) {
                 $categoryName = $group->categoryName ?? $noCategoryLabel;
                 $name = $categoryName . ' / ' . $name;
             }
@@ -119,7 +118,7 @@ class ListInfo extends ListReference implements JsonSerializable
         }
 
         asort($output);
-        return array_map(fn($name) => ltrim($name, ' / '), $output);
+        return array_map(fn ($name) => ltrim($name, ' / '), $output);
     }
 
     public function getGroupName(
@@ -127,13 +126,13 @@ class ListInfo extends ListReference implements JsonSerializable
         bool $forceCategories = false,
         ?string $noCategoryLabel = null
     ): ?string {
-        if(null === ($group = $this->groups[$groupId] ?? null)) {
+        if (null === ($group = $this->groups[$groupId] ?? null)) {
             return null;
         }
 
         $name = $group->name;
 
-        if(
+        if (
             $forceCategories ||
             $this->useCategories
         ) {
@@ -153,12 +152,12 @@ class ListInfo extends ListReference implements JsonSerializable
     ): array {
         $output = [];
 
-        foreach($this->groups as $group) {
+        foreach ($this->groups as $group) {
             $categoryName = $group->categoryName ?? $noCategoryLabel ?? 'No category';
             $output[$categoryName][$group->id] = $group->name;
         }
 
-        foreach($output as $category => $groups) {
+        foreach ($output as $category => $groups) {
             asort($output[$category]);
         }
 
@@ -173,8 +172,8 @@ class ListInfo extends ListReference implements JsonSerializable
     {
         $output = [];
 
-        foreach($this->groups as $group) {
-            if($group->categoryId === null) {
+        foreach ($this->groups as $group) {
+            if ($group->categoryId === null) {
                 continue;
             }
 
@@ -189,8 +188,8 @@ class ListInfo extends ListReference implements JsonSerializable
         string $categoryId,
         ?string $noCategoryLabel = null
     ): string {
-        foreach($this->groups as $group) {
-            if($group->categoryId === $categoryId) {
+        foreach ($this->groups as $group) {
+            if ($group->categoryId === $categoryId) {
                 return $group->categoryName ?? $noCategoryLabel ?? $categoryId;
             }
         }
@@ -202,7 +201,7 @@ class ListInfo extends ListReference implements JsonSerializable
         string $groupId,
         ?string $noCategoryLabel = null
     ): ?string {
-        if(null === ($group = $this->groups[$groupId] ?? null)) {
+        if (null === ($group = $this->groups[$groupId] ?? null)) {
             return null;
         }
 
@@ -216,7 +215,7 @@ class ListInfo extends ListReference implements JsonSerializable
     {
         $output = [];
 
-        foreach($this->tags as $tag) {
+        foreach ($this->tags as $tag) {
             $output[$tag->id] = $tag->name;
         }
 
@@ -245,11 +244,11 @@ class ListInfo extends ListReference implements JsonSerializable
             subscribeUrl: Coercion::tryString($data['subscribeUrl'] ?? null),
             memberCount: Coercion::tryInt($data['memberCount'] ?? null),
             groups: array_map(
-                fn($group) => GroupInfo::fromArray(Coercion::asArray($group)),
+                fn ($group) => GroupInfo::fromArray(Coercion::asArray($group)),
                 Coercion::asArray($data['groups'] ?? [])
             ),
             tags: array_map(
-                fn($tag) => TagInfo::fromArray(Coercion::asArray($tag)),
+                fn ($tag) => TagInfo::fromArray(Coercion::asArray($tag)),
                 Coercion::asArray($data['tags'] ?? [])
             ),
         );
@@ -258,7 +257,8 @@ class ListInfo extends ListReference implements JsonSerializable
     /**
      * @return ListInfoArray
      */
-    public function jsonSerialize(): array {
+    public function jsonSerialize(): array
+    {
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -267,11 +267,11 @@ class ListInfo extends ListReference implements JsonSerializable
             'subscribeUrl' => $this->subscribeUrl,
             'memberCount' => $this->memberCount,
             'groups' => array_map(
-                fn(GroupInfo $group) => $group->jsonSerialize(),
+                fn (GroupInfo $group) => $group->jsonSerialize(),
                 $this->groups
             ),
             'tags' => array_map(
-                fn(TagInfo $tag) => $tag->jsonSerialize(),
+                fn (TagInfo $tag) => $tag->jsonSerialize(),
                 $this->tags
             ),
         ];

@@ -25,7 +25,7 @@ class Probe implements Action
     public function execute(
         Request $request
     ): bool {
-        if(!$config = Telegraph::getConfig()) {
+        if (!$config = Telegraph::getConfig()) {
             $this->io->error('No config has been provided');
             return false;
         }
@@ -33,7 +33,7 @@ class Probe implements Action
         $sources = $config->getSourceNames();
         $map = [];
 
-        foreach($sources as $sourceName) {
+        foreach ($sources as $sourceName) {
             $settings = $config->getSourceSettings($sourceName);
             $settings = array_merge([
                 'adapter' => $config->getSourceAdapter($sourceName)
@@ -43,12 +43,12 @@ class Probe implements Action
             $map[$hash] = $settings;
         }
 
-        foreach($map as $settings) {
+        foreach ($map as $settings) {
             $adapter = Coercion::asString($settings['adapter']);
             $this->io->{'.brightMagenta'}($adapter . ' ');
             $adapter = Telegraph::loadAdapter($adapter, $settings);
 
-            foreach($adapter->fetchAllListReferences() as $list) {
+            foreach ($adapter->fetchAllListReferences() as $list) {
                 $this->io->{'>brightYellow'}($list->id . ' ');
                 $this->io->{'.brightCyan'}($list->name);
             }

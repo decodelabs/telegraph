@@ -25,12 +25,12 @@ use JsonSerializable;
  */
 class GroupInfo implements JsonSerializable
 {
-    protected(set) string $id;
-    protected(set) string $name;
-    protected(set) ?string $categoryId = null;
-    protected(set) ?string $categoryName = null;
+    public protected(set) string $id;
+    public protected(set) string $name;
+    public protected(set) ?string $categoryId = null;
+    public protected(set) ?string $categoryName = null;
 
-    protected(set) ?CarbonImmutable $creationDate = null {
+    public protected(set) ?CarbonImmutable $creationDate = null {
         set(?DateTimeInterface $value) {
             $this->creationDate = $value ? CarbonImmutable::instance($value) : null;
         }
@@ -68,7 +68,8 @@ class GroupInfo implements JsonSerializable
     /**
      * @return GroupInfoArray
      */
-    public function jsonSerialize(): array {
+    public function jsonSerialize(): array
+    {
         return [
             'id' => $this->id,
             'name' => $this->name,

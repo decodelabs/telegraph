@@ -11,8 +11,8 @@ namespace DecodeLabs\Telegraph;
 
 class SourceReference
 {
-    protected(set) string $name;
-    protected(set) string $remoteId;
+    public protected(set) string $name;
+    public protected(set) string $remoteId;
 
     public function __construct(
         string $name,

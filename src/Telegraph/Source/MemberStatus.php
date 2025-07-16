@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace DecodeLabs\Telegraph\Source;
 
-enum MemberStatus : string
+enum MemberStatus: string
 {
     case Subscribed = 'subscribed';
     case Pending = 'pending';

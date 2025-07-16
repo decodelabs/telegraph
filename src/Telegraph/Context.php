@@ -56,19 +56,20 @@ class Context
     public function setCache(
         Cache|CacheItemPoolInterface $cache
     ): void {
-        if($cache instanceof CacheItemPoolInterface) {
+        if ($cache instanceof CacheItemPoolInterface) {
             $cache = new Cache($cache);
         }
 
         $this->cache = $cache;
     }
 
-    public function getCache(): Cache {
-        if(isset($this->cache)) {
+    public function getCache(): Cache
+    {
+        if (isset($this->cache)) {
             return $this->cache;
         }
 
-        if(class_exists(Stash::class)) {
+        if (class_exists(Stash::class)) {
             return $this->cache = new Cache(
                 Stash::load(self::class)
             );
@@ -85,14 +86,14 @@ class Context
 
     public function getStore(): ?Store
     {
-        if($this->store !== false) {
+        if ($this->store !== false) {
             return $this->store;
         }
 
-        if(Monarch::$container->has(Store::class)) {
+        if (Monarch::$container->has(Store::class)) {
             $store = Monarch::$container->get(Store::class);
 
-            if($store instanceof Store) {
+            if ($store instanceof Store) {
                 return $this->store = $store;
             }
         }
@@ -104,7 +105,7 @@ class Context
     {
         $config = $this->getConfig();
 
-        if(!$sourceName = $config?->getDefaultSourceName()) {
+        if (!$sourceName = $config?->getDefaultSourceName()) {
             return null;
         }
 
@@ -114,11 +115,11 @@ class Context
     public function load(
         string|SourceReference $name
     ): ?Source {
-        if($name instanceof Source) {
+        if ($name instanceof Source) {
             return $name;
         }
 
-        if($name instanceof SourceReference) {
+        if ($name instanceof SourceReference) {
             $name = $name->name;
         }
 
@@ -129,7 +130,7 @@ class Context
         $adapter = $this->loadAdapterFor($name);
         $remoteId = $this->getConfig()?->getSourceRemoteId($name);
 
-        if(
+        if (
             $remoteId === null ||
             $adapter === null
         ) {
@@ -154,7 +155,7 @@ class Context
     {
         $names = $this->getConfig()?->getSourceNames() ?? [];
 
-        foreach($names as $name) {
+        foreach ($names as $name) {
             $this->load($name);
         }
 
@@ -172,7 +173,7 @@ class Context
     public function hasSource(
         string $name
     ): bool {
-        if(isset($this->sources[$name])) {
+        if (isset($this->sources[$name])) {
             return true;
         }
 
@@ -185,7 +186,7 @@ class Context
     {
         $config = $this->getConfig();
 
-        if(!$sourceName = $config?->getDefaultSourceName()) {
+        if (!$sourceName = $config?->getDefaultSourceName()) {
             return null;
         }
 
@@ -199,7 +200,7 @@ class Context
             return null;
         }
 
-        if(!$adapterName = $config->getSourceAdapter($name)) {
+        if (!$adapterName = $config->getSourceAdapter($name)) {
             return null;
         }
 
@@ -216,7 +217,7 @@ class Context
     ): Adapter {
         $name = ucfirst($name);
 
-        if(!$class = Archetype::tryResolve(Adapter::class, $name)) {
+        if (!$class = Archetype::tryResolve(Adapter::class, $name)) {
             throw Exceptional::NotFound(
                 'Telegraph adapter not found: ' . $name
             );
@@ -228,11 +229,11 @@ class Context
     protected function normalizeSourceReference(
         string|SourceReference $source
     ): SourceReference {
-        if($source instanceof SourceReference) {
+        if ($source instanceof SourceReference) {
             return $source;
         }
 
-        if(isset($this->sources[$source])) {
+        if (isset($this->sources[$source])) {
             return $this->sources[$source];
         }
 
@@ -261,7 +262,7 @@ class Context
     {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
+        foreach ($this->loadAll() as $source) {
             $output[$source->name] = $source->refreshListInfo();
         }
 
@@ -451,8 +452,8 @@ class Context
     ): array {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
-            if($source->isDiscipleSubscribed()) {
+        foreach ($this->loadAll() as $source) {
+            if ($source->isDiscipleSubscribed()) {
                 $output[$source->name] = $source->updateDisciple($request);
             }
         }
@@ -470,8 +471,8 @@ class Context
     ): array {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
-            if($source->isUserSubscribed($userId, $email)) {
+        foreach ($this->loadAll() as $source) {
+            if ($source->isUserSubscribed($userId, $email)) {
                 $output[$source->name] = $source->updateUser($userId, $email, $request);
             }
         }
@@ -488,8 +489,8 @@ class Context
     ): array {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
-            if($source->isSubscribed($email)) {
+        foreach ($this->loadAll() as $source) {
+            if ($source->isSubscribed($email)) {
                 $output[$source->name] = $source->update($email, $request);
             }
         }
@@ -531,7 +532,7 @@ class Context
     {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
+        foreach ($this->loadAll() as $source) {
             $output[$source->name] = $this->unsubscribeDisciple($source);
         }
 
@@ -547,7 +548,7 @@ class Context
     ): array {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
+        foreach ($this->loadAll() as $source) {
             $output[$source->name] = $this->unsubscribeUser($source, $userId, $email);
         }
 
@@ -562,7 +563,7 @@ class Context
     ): array {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
+        foreach ($this->loadAll() as $source) {
             $output[$source->name] = $this->unsubscribe($source, $email);
         }
 
@@ -589,7 +590,7 @@ class Context
     {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
+        foreach ($this->loadAll() as $source) {
             $output[$source->name] = $source->refreshDiscipleMemberInfo();
         }
 
@@ -622,7 +623,7 @@ class Context
     ): array {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
+        foreach ($this->loadAll() as $source) {
             $output[$source->name] = $this->refreshUserMemberInfo($source, $userId, $email);
         }
 
@@ -652,7 +653,7 @@ class Context
     ): array {
         $output = [];
 
-        foreach($this->loadAll() as $source) {
+        foreach ($this->loadAll() as $source) {
             $output[$source->name] = $this->refreshMemberInfo($source, $email);
         }
 

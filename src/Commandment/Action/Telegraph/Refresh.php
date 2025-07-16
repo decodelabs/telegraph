@@ -34,11 +34,11 @@ class Refresh implements Action
         $source = $request->parameters->tryString('source');
         $sources = $this->getSources($source);
 
-        foreach($sources as $source) {
+        foreach ($sources as $source) {
             $this->io->{'brightMagenta'}($source->name . ' ');
             $info = $source->refreshListInfo();
 
-            if($info !== null) {
+            if ($info !== null) {
                 $this->io->{'brightYellow'}($info->id . ' ');
                 $this->io->success('done');
             } else {
@@ -55,7 +55,7 @@ class Refresh implements Action
     private function getSources(
         ?string $source = null
     ): array {
-        if($source !== null) {
+        if ($source !== null) {
             $source = Telegraph::load($source);
             return $source !== null ? [$source] : [];
         }

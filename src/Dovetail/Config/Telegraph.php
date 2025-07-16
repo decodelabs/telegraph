@@ -39,7 +39,7 @@ class Telegraph implements Config, ConfigInterface
 
         $firstKey = Coercion::asString($keys[0]);
 
-        if(str_starts_with($firstKey, '!')) {
+        if (str_starts_with($firstKey, '!')) {
             return null;
         }
 
@@ -50,10 +50,10 @@ class Telegraph implements Config, ConfigInterface
     {
         $output = [];
 
-        foreach($this->data->getKeys() as $key) {
+        foreach ($this->data->getKeys() as $key) {
             $key = (string)$key;
 
-            if(str_starts_with($key, '!')) {
+            if (str_starts_with($key, '!')) {
                 continue;
             }
 

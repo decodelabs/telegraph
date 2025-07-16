@@ -12,12 +12,11 @@ namespace DecodeLabs\Telegraph\Source;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 
-
 class ListReference
 {
-    protected(set) string $id;
-    protected(set) string $name;
-    protected(set) CarbonImmutable $fetchDate {
+    public protected(set) string $id;
+    public protected(set) string $name;
+    public protected(set) CarbonImmutable $fetchDate {
         set(?DateTimeInterface $value) {
             $this->fetchDate = $value ?
                 CarbonImmutable::instance($value) :
@@ -25,7 +24,7 @@ class ListReference
         }
     }
 
-    protected(set) ?CarbonImmutable $creationDate = null {
+    public protected(set) ?CarbonImmutable $creationDate = null {
         set(?DateTimeInterface $value) {
             $this->creationDate = $value ?
                 CarbonImmutable::instance($value) :
@@ -33,8 +32,8 @@ class ListReference
         }
     }
 
-    protected(set) ?string $subscribeUrl = null;
-    protected(set) ?int $memberCount = null;
+    public protected(set) ?string $subscribeUrl = null;
+    public protected(set) ?int $memberCount = null;
 
     public function __construct(
         string $id,
