@@ -20,7 +20,9 @@ use DecodeLabs\Telegraph\Source\GroupInfo as Ref8;
 use DecodeLabs\Telegraph\Source\TagInfo as Ref9;
 use DecodeLabs\Telegraph\MemberDataRequest as Ref10;
 use DecodeLabs\Telegraph\SubscriptionResponse as Ref11;
-use DecodeLabs\Telegraph\Source\MemberInfo as Ref12;
+use DecodeLabs\Telegraph\Source\ConsentField as Ref12;
+use DecodeLabs\Telegraph\Source\ConsentType as Ref13;
+use DecodeLabs\Telegraph\Source\MemberInfo as Ref14;
 
 class Telegraph implements Proxy
 {
@@ -82,6 +84,9 @@ class Telegraph implements Proxy
     public static function getCategorizedGroupOptions(Ref5|string $source, ?string $noCategoryLabel = NULL): array {
         return static::$_veneerInstance->getCategorizedGroupOptions(...func_get_args());
     }
+    public static function getGroups(Ref5|string $source): array {
+        return static::$_veneerInstance->getGroups(...func_get_args());
+    }
     public static function getGroup(Ref5|string $source, string $groupId): ?Ref8 {
         return static::$_veneerInstance->getGroup(...func_get_args());
     }
@@ -100,6 +105,9 @@ class Telegraph implements Proxy
     public static function getTagOptions(Ref5|string $source): array {
         return static::$_veneerInstance->getTagOptions(...func_get_args());
     }
+    public static function getTags(Ref5|string $source): array {
+        return static::$_veneerInstance->getTags(...func_get_args());
+    }
     public static function getTag(Ref5|string $source, string $tagId): ?Ref9 {
         return static::$_veneerInstance->getTag(...func_get_args());
     }
@@ -108,6 +116,15 @@ class Telegraph implements Proxy
     }
     public static function subscribeDisciple(Ref5|string $source, ?Ref10 $request = NULL): Ref11 {
         return static::$_veneerInstance->subscribeDisciple(...func_get_args());
+    }
+    public static function getConsentFields(Ref5|string $source): array {
+        return static::$_veneerInstance->getConsentFields(...func_get_args());
+    }
+    public static function getConsentField(Ref5|string $source, string $consentFieldId): ?Ref12 {
+        return static::$_veneerInstance->getConsentField(...func_get_args());
+    }
+    public static function getTypeConsentField(Ref5|string $source, Ref13 $type): ?Ref12 {
+        return static::$_veneerInstance->getTypeConsentField(...func_get_args());
     }
     public static function subscribeUser(Ref5|string $source, string $userId, Ref10 $request): Ref11 {
         return static::$_veneerInstance->subscribeUser(...func_get_args());
@@ -160,28 +177,28 @@ class Telegraph implements Proxy
     public static function unsubscribeAll(string $email): array {
         return static::$_veneerInstance->unsubscribeAll(...func_get_args());
     }
-    public static function getDiscipleMemberInfo(Ref5|string $source, bool $force = false): ?Ref12 {
+    public static function getDiscipleMemberInfo(Ref5|string $source, bool $force = false): ?Ref14 {
         return static::$_veneerInstance->getDiscipleMemberInfo(...func_get_args());
     }
-    public static function refreshDiscipleMemberInfo(Ref5|string $source): ?Ref12 {
+    public static function refreshDiscipleMemberInfo(Ref5|string $source): ?Ref14 {
         return static::$_veneerInstance->refreshDiscipleMemberInfo(...func_get_args());
     }
     public static function refreshDiscipleMemberInfoAll(): array {
         return static::$_veneerInstance->refreshDiscipleMemberInfoAll();
     }
-    public static function getUserMemberInfo(Ref5|string $source, string $userId, string $email, bool $force = false): ?Ref12 {
+    public static function getUserMemberInfo(Ref5|string $source, string $userId, string $email, bool $force = false): ?Ref14 {
         return static::$_veneerInstance->getUserMemberInfo(...func_get_args());
     }
-    public static function refreshUserMemberInfo(Ref5|string $source, string $userId, string $email): ?Ref12 {
+    public static function refreshUserMemberInfo(Ref5|string $source, string $userId, string $email): ?Ref14 {
         return static::$_veneerInstance->refreshUserMemberInfo(...func_get_args());
     }
     public static function refreshUserMemberInfoAll(string $userId, string $email): array {
         return static::$_veneerInstance->refreshUserMemberInfoAll(...func_get_args());
     }
-    public static function getMemberInfo(Ref5|string $source, string $email, bool $force = false): ?Ref12 {
+    public static function getMemberInfo(Ref5|string $source, string $email, bool $force = false): ?Ref14 {
         return static::$_veneerInstance->getMemberInfo(...func_get_args());
     }
-    public static function refreshMemberInfo(Ref5|string $source, string $email): ?Ref12 {
+    public static function refreshMemberInfo(Ref5|string $source, string $email): ?Ref14 {
         return static::$_veneerInstance->refreshMemberInfo(...func_get_args());
     }
     public static function refreshMemberInfoAll(string $email): array {

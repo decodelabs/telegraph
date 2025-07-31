@@ -16,6 +16,7 @@ use JsonSerializable;
 /**
  * @phpstan-import-type GroupInfoArray from GroupInfo
  * @phpstan-import-type TagInfoArray from TagInfo
+ * @phpstan-import-type ConsentFieldArray from ConsentField
  * @phpstan-type ListInfoArray array{
  *     id: string,
  *     name: string,
@@ -25,6 +26,7 @@ use JsonSerializable;
  *     memberCount: ?int,
  *     groups: array<GroupInfoArray>,
  *     tags: array<TagInfoArray>,
+ *     consentFields: array<ConsentFieldArray>,
  * }
  */
 class ListInfo extends ListReference implements JsonSerializable
@@ -38,6 +40,11 @@ class ListInfo extends ListReference implements JsonSerializable
      * @var array<string,TagInfo>
      */
     public protected(set) array $tags = [];
+
+    /**
+     * @var array<string,ConsentField>
+     */
+    public protected(set) array $consentFields = [];
 
     private bool $useCategories {
         get {
@@ -66,6 +73,7 @@ class ListInfo extends ListReference implements JsonSerializable
     /**
      * @param array<GroupInfo> $groups
      * @param array<TagInfo> $tags
+     * @param array<ConsentField> $consentFields
      */
     public function __construct(
         string $id,
@@ -75,7 +83,8 @@ class ListInfo extends ListReference implements JsonSerializable
         ?string $subscribeUrl = null,
         ?int $memberCount = null,
         array $groups = [],
-        array $tags = []
+        array $tags = [],
+        array $consentFields = []
     ) {
         parent::__construct(
             id: $id,
@@ -92,6 +101,10 @@ class ListInfo extends ListReference implements JsonSerializable
 
         foreach ($tags as $tag) {
             $this->tags[$tag->id] = $tag;
+        }
+
+        foreach ($consentFields as $consentField) {
+            $this->consentFields[$consentField->id] = $consentField;
         }
     }
 
@@ -119,6 +132,12 @@ class ListInfo extends ListReference implements JsonSerializable
 
         asort($output);
         return array_map(fn ($name) => ltrim($name, ' / '), $output);
+    }
+
+    public function getGroup(
+        string $groupId
+    ): ?GroupInfo {
+        return $this->groups[$groupId] ?? null;
     }
 
     public function getGroupName(
@@ -223,10 +242,49 @@ class ListInfo extends ListReference implements JsonSerializable
         return $output;
     }
 
+    public function getTag(
+        string $tagId
+    ): ?TagInfo {
+        return $this->tags[$tagId] ?? null;
+    }
+
     public function getTagName(
         string $tagId
     ): ?string {
         return ($this->tags[$tagId] ?? null)?->name;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getConsentFieldOptions(): array
+    {
+        $output = [];
+
+        foreach ($this->consentFields as $consentField) {
+            $output[$consentField->id] = $consentField->description;
+        }
+
+        asort($output);
+        return $output;
+    }
+
+    public function getConsentField(
+        string $consentFieldId
+    ): ?ConsentField {
+        return $this->consentFields[$consentFieldId] ?? null;
+    }
+
+    public function getTypeConsentField(
+        ConsentType $type
+    ): ?ConsentField {
+        foreach ($this->consentFields as $consentField) {
+            if ($consentField->type === $type) {
+                return $consentField;
+            }
+        }
+
+        return null;
     }
 
 
@@ -251,6 +309,10 @@ class ListInfo extends ListReference implements JsonSerializable
                 fn ($tag) => TagInfo::fromArray(Coercion::asArray($tag)),
                 Coercion::asArray($data['tags'] ?? [])
             ),
+            consentFields: array_map(
+                fn ($consentField) => ConsentField::fromArray(Coercion::asArray($consentField)),
+                Coercion::asArray($data['consentFields'] ?? [])
+            ),
         );
     }
 
@@ -273,6 +335,10 @@ class ListInfo extends ListReference implements JsonSerializable
             'tags' => array_map(
                 fn (TagInfo $tag) => $tag->jsonSerialize(),
                 $this->tags
+            ),
+            'consentFields' => array_map(
+                fn (ConsentField $consentField) => $consentField->jsonSerialize(),
+                $this->consentFields
             ),
         ];
     }

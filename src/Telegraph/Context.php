@@ -16,6 +16,8 @@ use DecodeLabs\Exceptional;
 use DecodeLabs\Monarch;
 use DecodeLabs\Stash;
 use DecodeLabs\Telegraph;
+use DecodeLabs\Telegraph\Source\ConsentField;
+use DecodeLabs\Telegraph\Source\ConsentType;
 use DecodeLabs\Telegraph\Source\GroupInfo;
 use DecodeLabs\Telegraph\Source\ListInfo;
 use DecodeLabs\Telegraph\Source\MemberInfo;
@@ -291,11 +293,20 @@ class Context
         return $this->getListInfo($source)?->getCategorizedGroupOptions($noCategoryLabel) ?? [];
     }
 
+    /**
+     * @return array<string,GroupInfo>
+     */
+    public function getGroups(
+        string|SourceReference $source
+    ): array {
+        return $this->getListInfo($source)->groups ?? [];
+    }
+
     public function getGroup(
         string|SourceReference $source,
         string $groupId
     ): ?GroupInfo {
-        return $this->getListInfo($source)?->groups[$groupId] ?? null;
+        return $this->getListInfo($source)?->getGroup($groupId);
     }
 
     public function getGroupName(
@@ -341,11 +352,20 @@ class Context
         return $this->getListInfo($source)?->getTagOptions() ?? [];
     }
 
+    /**
+     * @return array<string,TagInfo>
+     */
+    public function getTags(
+        string|SourceReference $source
+    ): array {
+        return $this->getListInfo($source)->tags ?? [];
+    }
+
     public function getTag(
         string|SourceReference $source,
         string $tagId
     ): ?TagInfo {
-        return $this->getListInfo($source)?->tags[$tagId] ?? null;
+        return $this->getListInfo($source)?->getTag($tagId);
     }
 
     public function getTagName(
@@ -363,6 +383,31 @@ class Context
             ?->subscribeDisciple($request)
             ?? $this->newFailureResponse($source);
     }
+
+
+    /**
+     * @return array<string,ConsentField>
+     */
+    public function getConsentFields(
+        string|SourceReference $source
+    ): array {
+        return $this->getListInfo($source)->consentFields ?? [];
+    }
+
+    public function getConsentField(
+        string|SourceReference $source,
+        string $consentFieldId
+    ): ?ConsentField {
+        return $this->getListInfo($source)?->getConsentField($consentFieldId);
+    }
+
+    public function getTypeConsentField(
+        string|SourceReference $source,
+        ConsentType $type
+    ): ?ConsentField {
+        return $this->getListInfo($source)?->getTypeConsentField($type);
+    }
+
 
     public function subscribeUser(
         string|SourceReference $source,

@@ -78,10 +78,16 @@ class MemberDataRequest
      */
     public protected(set) array $tags = [];
 
+    /**
+     * @var array<string,bool>
+     */
+    public protected(set) array $consent = [];
+
 
     /**
      * @param array<string,bool|string> $groups
      * @param array<string,bool|string> $tags
+     * @param array<string,bool|string> $consent
      */
     public function __construct(
         ?string $email = null,
@@ -91,6 +97,7 @@ class MemberDataRequest
         ?string $language = null,
         array $groups = [],
         array $tags = [],
+        array $consent = [],
     ) {
         $this->email = $email;
         $this->firstName = $firstName;
@@ -114,6 +121,15 @@ class MemberDataRequest
             }
 
             $this->setTagIntent((string)$id, $intent);
+        }
+
+        foreach ($consent as $id => $intent) {
+            if (is_string($intent)) {
+                $id = $intent;
+                $intent = true;
+            }
+
+            $this->setConsentIntent($id, $intent);
         }
     }
 
@@ -201,5 +217,46 @@ class MemberDataRequest
         string $id
     ): void {
         unset($this->tags[$id]);
+    }
+
+    public function addConsent(
+        string $id
+    ): void {
+        $this->consent[$id] = true;
+    }
+
+    public function removeConsent(
+        string $id
+    ): void {
+        $this->consent[$id] = false;
+    }
+
+    public function setConsentIntent(
+        string $id,
+        ?bool $intent
+    ): void {
+        match ($intent) {
+            true => $this->addConsent($id),
+            false => $this->removeConsent($id),
+            default => $this->unsetConsent($id)
+        };
+    }
+
+    public function getConsentIntent(
+        string $id
+    ): ?bool {
+        return $this->consent[$id] ?? null;
+    }
+
+    public function hasConsent(
+        string $id
+    ): bool {
+        return isset($this->consent[$id]);
+    }
+
+    public function unsetConsent(
+        string $id
+    ): void {
+        unset($this->consent[$id]);
     }
 }

@@ -71,8 +71,14 @@ class MemberInfo implements JsonSerializable
     public protected(set) array $tags = [];
 
     /**
+     * @var array<ConsentField>
+     */
+    public protected(set) array $consent = [];
+
+    /**
      * @param array<GroupInfo> $groups
      * @param array<TagInfo> $tags
+     * @param array<ConsentField> $consent
      */
     public function __construct(
         string $id,
@@ -86,7 +92,8 @@ class MemberInfo implements JsonSerializable
         ?string $language = null,
         ?EmailType $emailType = null,
         array $groups = [],
-        array $tags = []
+        array $tags = [],
+        array $consent = []
     ) {
         $this->id = $id;
         $this->email = $email;
@@ -105,6 +112,10 @@ class MemberInfo implements JsonSerializable
 
         foreach ($tags as $tag) {
             $this->tags[$tag->id] = $tag;
+        }
+
+        foreach ($consent as $consentField) {
+            $this->consent[$consentField->id] = $consentField;
         }
     }
 
@@ -133,6 +144,10 @@ class MemberInfo implements JsonSerializable
                 fn ($tag) => TagInfo::fromArray(Coercion::asArray($tag)),
                 Coercion::asArray($data['tags'] ?? [])
             ),
+            consent: array_map(
+                fn ($consent) => ConsentField::fromArray(Coercion::asArray($consent)),
+                Coercion::asArray($data['consent'] ?? [])
+            ),
         );
     }
 
@@ -159,6 +174,10 @@ class MemberInfo implements JsonSerializable
             'tags' => array_map(
                 fn (TagInfo $tag) => $tag->jsonSerialize(),
                 $this->tags
+            ),
+            'consent' => array_map(
+                fn (ConsentField $consent) => $consent->jsonSerialize(),
+                $this->consent
             ),
         ];
     }

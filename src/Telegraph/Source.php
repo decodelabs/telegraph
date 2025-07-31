@@ -11,6 +11,8 @@ namespace DecodeLabs\Telegraph;
 
 use DecodeLabs\Disciple;
 use DecodeLabs\Exceptional;
+use DecodeLabs\Telegraph\Source\ConsentField;
+use DecodeLabs\Telegraph\Source\ConsentType;
 use DecodeLabs\Telegraph\Source\GroupInfo;
 use DecodeLabs\Telegraph\Source\ListInfo;
 use DecodeLabs\Telegraph\Source\MemberInfo;
@@ -88,10 +90,18 @@ class Source extends SourceReference
         return $this->getListInfo()?->getCategorizedGroupOptions($noCategoryLabel) ?? [];
     }
 
+    /**
+     * @return array<string,GroupInfo>
+     */
+    public function getGroups(): array
+    {
+        return $this->getListInfo()->groups ?? [];
+    }
+
     public function getGroup(
         string $groupId
     ): ?GroupInfo {
-        return $this->getListInfo()?->groups[$groupId] ?? null;
+        return $this->getListInfo()?->getGroup($groupId);
     }
 
     public function getGroupName(
@@ -132,10 +142,18 @@ class Source extends SourceReference
         return $this->getListInfo()?->getTagOptions() ?? [];
     }
 
+    /**
+     * @return array<string,TagInfo>
+     */
+    public function getTags(): array
+    {
+        return $this->getListInfo()->tags ?? [];
+    }
+
     public function getTag(
         string $tagId
     ): ?TagInfo {
-        return $this->getListInfo()?->tags[$tagId] ?? null;
+        return $this->getListInfo()?->getTag($tagId);
     }
 
     public function getTagName(
@@ -143,6 +161,38 @@ class Source extends SourceReference
     ): ?string {
         return $this->getListInfo()?->getTagName($tagId);
     }
+
+
+    /**
+     * @return array<string,string>
+     */
+    public function getConsentFieldOptions(): array
+    {
+        return $this->getListInfo()?->getConsentFieldOptions() ?? [];
+    }
+
+    /**
+     * @return array<string,ConsentField>
+     */
+    public function getConsentFields(): array
+    {
+        return $this->getListInfo()->consentFields ?? [];
+    }
+
+    public function getConsentField(
+        string $consentFieldId
+    ): ?ConsentField {
+        return $this->getListInfo()?->getConsentField($consentFieldId);
+    }
+
+    public function getTypeConsentField(
+        ConsentType $type
+    ): ?ConsentField {
+        return $this->getListInfo()?->getTypeConsentField($type);
+    }
+
+
+
 
     public function subscribeDisciple(
         ?MemberDataRequest $request = null
