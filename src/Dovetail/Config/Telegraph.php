@@ -23,7 +23,7 @@ class Telegraph implements Config, ConfigInterface
         return [
             '!example' => [
                 'adapter' => 'Mailchimp',
-                'apiKey' => "{{envString('MAILCHIMP_API_KEY','abc1234567890')}}",
+                'apiKey' => "{{Env::asString('MAILCHIMP_API_KEY','abc1234567890')}}",
                 'list' => '123b456f'
             ]
         ];

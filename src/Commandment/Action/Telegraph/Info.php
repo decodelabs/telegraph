@@ -23,14 +23,15 @@ use DecodeLabs\Terminus\Session;
 class Info implements Action
 {
     public function __construct(
-        protected Session $io
+        protected Session $io,
+        protected Telegraph $telegraph
     ) {
     }
 
     public function execute(
         Request $request
     ): bool {
-        $info = Telegraph::getListInfo($request->parameters->asString('source'));
+        $info = $this->telegraph->getListInfo($request->parameters->asString('source'));
 
         if (!$info) {
             $this->io->error('No list info found');

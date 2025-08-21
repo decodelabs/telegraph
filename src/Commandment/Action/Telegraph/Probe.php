@@ -18,14 +18,15 @@ use DecodeLabs\Terminus\Session;
 class Probe implements Action
 {
     public function __construct(
-        protected Session $io
+        protected Session $io,
+        protected Telegraph $telegraph
     ) {
     }
 
     public function execute(
         Request $request
     ): bool {
-        if (!$config = Telegraph::getConfig()) {
+        if (!$config = $this->telegraph->config) {
             $this->io->error('No config has been provided');
             return false;
         }
@@ -46,7 +47,7 @@ class Probe implements Action
         foreach ($map as $settings) {
             $adapter = Coercion::asString($settings['adapter']);
             $this->io->{'.brightMagenta'}($adapter . ' ');
-            $adapter = Telegraph::loadAdapter($adapter, $settings);
+            $adapter = $this->telegraph->loadAdapter($adapter, $settings);
 
             foreach ($adapter->fetchAllListReferences() as $list) {
                 $this->io->{'>brightYellow'}($list->id . ' ');

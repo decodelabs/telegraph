@@ -24,18 +24,21 @@ class Source extends SourceReference
     public protected(set) Adapter $adapter;
     public protected(set) Cache $cache;
     public protected(set) ?Store $store = null;
+    protected ?Disciple $disciple = null;
 
     public function __construct(
         string $name,
         string $remoteId,
         Adapter $adapter,
         Cache $cache,
-        ?Store $store = null
+        ?Store $store = null,
+        ?Disciple $disciple = null
     ) {
         parent::__construct($name, $remoteId);
         $this->adapter = $adapter;
         $this->cache = $cache;
         $this->store = $store;
+        $this->disciple = $disciple;
     }
 
     public function getListInfo(): ?ListInfo
@@ -197,9 +200,9 @@ class Source extends SourceReference
     public function subscribeDisciple(
         ?MemberDataRequest $request = null
     ): SubscriptionResponse {
-        if (!class_exists(Disciple::class)) {
+        if (!$this->disciple) {
             throw Exceptional::ComponentUnavailable(
-                'Disciple package is not installed'
+                'Disciple service is not available'
             );
         }
 
@@ -208,27 +211,27 @@ class Source extends SourceReference
         }
 
         if ($request->email === null) {
-            $request->email = Disciple::getEmail();
+            $request->email = $this->disciple->email;
         }
 
         if ($request->firstName === null) {
-            $request->firstName = Disciple::getFirstName();
+            $request->firstName = $this->disciple->firstName;
         }
 
         if ($request->lastName === null) {
-            $request->lastName = Disciple::getSurname();
+            $request->lastName = $this->disciple->surname;
         }
 
         if ($request->country === null) {
-            $request->country = Disciple::getCountry();
+            $request->country = $this->disciple->country;
         }
 
         if ($request->language === null) {
-            $request->language = Disciple::getLanguage();
+            $request->language = $this->disciple->language;
         }
 
         return $this->subscribeUser(
-            Disciple::getActiveId(),
+            $this->disciple->activeId,
             $request
         );
     }
@@ -297,9 +300,15 @@ class Source extends SourceReference
         string|GroupInfo|null $group = null,
         string|TagInfo|null $tag = null
     ): bool {
+        if (!$this->disciple) {
+            throw Exceptional::ComponentUnavailable(
+                'Disciple service is not available'
+            );
+        }
+
         return $this->isUserSubscribed(
-            userId: Disciple::getActiveId(),
-            email: (string)Disciple::getEmail(),
+            userId: $this->disciple->activeId,
+            email: (string)$this->disciple->email,
             group: $group,
             tag: $tag
         );
@@ -331,15 +340,15 @@ class Source extends SourceReference
     public function updateDisciple(
         MemberDataRequest $request
     ): SubscriptionResponse {
-        if (!class_exists(Disciple::class)) {
+        if (!$this->disciple) {
             throw Exceptional::ComponentUnavailable(
-                'Disciple package is not installed'
+                'Disciple service is not available'
             );
         }
 
         return $this->updateUser(
-            Disciple::getActiveId(),
-            (string)Disciple::getEmail(),
+            $this->disciple->activeId,
+            (string)$this->disciple->email,
             $request
         );
     }
@@ -391,15 +400,15 @@ class Source extends SourceReference
 
     public function unsubscribeDisciple(): SubscriptionResponse
     {
-        if (!class_exists(Disciple::class)) {
+        if (!$this->disciple) {
             throw Exceptional::ComponentUnavailable(
-                'Disciple package is not installed'
+                'Disciple service is not available'
             );
         }
 
         return $this->unsubscribeUser(
-            Disciple::getActiveId(),
-            (string)Disciple::getEmail()
+            $this->disciple->activeId,
+            (string)$this->disciple->email
         );
     }
 
@@ -440,24 +449,30 @@ class Source extends SourceReference
     public function getDiscipleMemberInfo(
         bool $force = false
     ): ?MemberInfo {
-        if (!class_exists(Disciple::class)) {
+        if (!$this->disciple) {
             throw Exceptional::ComponentUnavailable(
-                'Disciple package is not installed'
+                'Disciple service is not available'
             );
         }
 
         return $this->getUserMemberInfo(
-            Disciple::getActiveId(),
-            (string)Disciple::getEmail(),
+            $this->disciple->activeId,
+            (string)$this->disciple->email,
             $force
         );
     }
 
     public function refreshDiscipleMemberInfo(): ?MemberInfo
     {
+        if (!$this->disciple) {
+            throw Exceptional::ComponentUnavailable(
+                'Disciple service is not available'
+            );
+        }
+
         return $this->refreshUserMemberInfo(
-            Disciple::getActiveId(),
-            (string)Disciple::getEmail()
+            $this->disciple->activeId,
+            (string)$this->disciple->email
         );
     }
 

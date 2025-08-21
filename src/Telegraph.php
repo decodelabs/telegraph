@@ -7,107 +7,85 @@
 
 declare(strict_types=1);
 
-namespace DecodeLabs\Telegraph;
+namespace DecodeLabs;
 
-use DecodeLabs\Archetype;
-use DecodeLabs\Dovetail;
 use DecodeLabs\Dovetail\Config\Telegraph as TelegraphConfig;
-use DecodeLabs\Exceptional;
-use DecodeLabs\Monarch;
-use DecodeLabs\Stash;
-use DecodeLabs\Telegraph;
+use DecodeLabs\Kingdom\ContainerAdapter;
+use DecodeLabs\Kingdom\Service;
+use DecodeLabs\Kingdom\ServiceTrait;
+use DecodeLabs\Stash\Store\Generic as GenericStashStore;
+use DecodeLabs\Telegraph\Adapter;
+use DecodeLabs\Telegraph\Cache;
+use DecodeLabs\Telegraph\Config;
+use DecodeLabs\Telegraph\FailureReason;
+use DecodeLabs\Telegraph\MemberDataRequest;
+use DecodeLabs\Telegraph\Source;
 use DecodeLabs\Telegraph\Source\ConsentField;
 use DecodeLabs\Telegraph\Source\ConsentType;
 use DecodeLabs\Telegraph\Source\GroupInfo;
 use DecodeLabs\Telegraph\Source\ListInfo;
 use DecodeLabs\Telegraph\Source\MemberInfo;
 use DecodeLabs\Telegraph\Source\TagInfo;
-use DecodeLabs\Veneer;
-use Psr\Cache\CacheItemPoolInterface;
+use DecodeLabs\Telegraph\SourceReference;
+use DecodeLabs\Telegraph\Store;
+use DecodeLabs\Telegraph\SubscriptionResponse;
 
-class Context
+class Telegraph implements Service
 {
+    use ServiceTrait;
+
     /**
      * @var array<string,Source>
      */
     protected array $sources = [];
 
-    protected ?Config $config = null;
-    protected ?Cache $cache = null;
-    protected Store|false|null $store = false;
+    public ?Config $config = null;
+    public ?Store $store = null;
+    public Cache $cache;
 
-
-    public function setConfig(
-        ?Config $config
-    ): void {
-        $this->config = $config;
-    }
-
-    public function getConfig(): ?Config
-    {
+    public static function provideService(
+        ContainerAdapter $container
+    ): static {
         if (
-            $this->config === null &&
+            !$container->has(Config::class) &&
             class_exists(Dovetail::class)
         ) {
-            $this->config = TelegraphConfig::load();
+            $container->setType(Config::class, TelegraphConfig::class);
         }
 
-        return $this->config;
-    }
-
-    public function setCache(
-        Cache|CacheItemPoolInterface $cache
-    ): void {
-        if ($cache instanceof CacheItemPoolInterface) {
-            $cache = new Cache($cache);
-        }
-
-        $this->cache = $cache;
-    }
-
-    public function getCache(): Cache
-    {
-        if (isset($this->cache)) {
-            return $this->cache;
-        }
-
-        if (class_exists(Stash::class)) {
-            return $this->cache = new Cache(
-                Stash::load(self::class)
+        if (
+            !$container->has(Cache::class) &&
+            class_exists(Stash::class)
+        ) {
+            $container->setFactory(
+                Cache::class,
+                fn (Stash $stash) => new Cache(
+                    Coercion::newLazyProxy(
+                        GenericStashStore::class,
+                        fn () => $stash->load(self::class)
+                    )
+                )
             );
         }
 
-        return $this->cache = new Cache(null);
+        return $container->getOrCreate(static::class);
     }
 
-    public function setStore(
-        Store $store
-    ): void {
+    public function __construct(
+        ?Config $config,
+        ?Store $store,
+        ?Cache $cache,
+        protected(set) Archetype $archetype,
+        protected(set) ?Disciple $disciple = null
+    ) {
+        $this->config = $config;
         $this->store = $store;
-    }
-
-    public function getStore(): ?Store
-    {
-        if ($this->store !== false) {
-            return $this->store;
-        }
-
-        if (Monarch::$container->has(Store::class)) {
-            $store = Monarch::$container->get(Store::class);
-
-            if ($store instanceof Store) {
-                return $this->store = $store;
-            }
-        }
-
-        return $this->store = null;
+        $this->cache = $cache ?? new Cache(null);
     }
 
     public function loadDefault(): ?Source
     {
-        $config = $this->getConfig();
-
-        if (!$sourceName = $config?->getDefaultSourceName()) {
+        if (!$sourceName = $this->config?->getDefaultSourceName()) {
             return null;
         }
 
@@ -130,7 +108,7 @@ class Context
         }
 
         $adapter = $this->loadAdapterFor($name);
-        $remoteId = $this->getConfig()?->getSourceRemoteId($name);
+        $remoteId = $this->config?->getSourceRemoteId($name);
 
         if (
             $remoteId === null ||
@@ -143,8 +121,9 @@ class Context
             name: $name,
             remoteId: $remoteId,
             adapter: $adapter,
-            cache: $this->getCache(),
-            store: $this->getStore(),
+            cache: $this->cache,
+            store: $this->store,
+            disciple: $this->disciple
         );
 
         return $this->sources[$name] = $source;
@@ -155,7 +134,7 @@ class Context
      */
     public function loadAll(): array
     {
-        $names = $this->getConfig()?->getSourceNames() ?? [];
+        $names = $this->config?->getSourceNames() ?? [];
 
         foreach ($names as $name) {
             $this->load($name);
@@ -169,7 +148,7 @@ class Context
      */
     public function getSourceNames(): array
     {
-        return $this->getConfig()?->getSourceNames() ?? [];
+        return $this->config?->getSourceNames() ?? [];
     }
 
     public function hasSource(
@@ -179,16 +158,14 @@ class Context
             return true;
         }
 
-        return (bool) $this->getConfig()?->getSourceRemoteId($name);
+        return (bool) $this->config?->getSourceRemoteId($name);
     }
 
 
 
     public function loadDefaultAdapter(): ?Adapter
     {
-        $config = $this->getConfig();
-
-        if (!$sourceName = $config?->getDefaultSourceName()) {
+        if (!$sourceName = $this->config?->getDefaultSourceName()) {
             return null;
         }
 
@@ -198,15 +175,11 @@ class Context
     public function loadAdapterFor(
         string $name
     ): ?Adapter {
-        if (!$config = $this->getConfig()) {
+        if (!$adapterName = $this->config?->getSourceAdapter($name)) {
             return null;
         }
 
-        if (!$adapterName = $config->getSourceAdapter($name)) {
-            return null;
-        }
-
-        $settings = $config->getSourceSettings($name);
+        $settings = $this->config?->getSourceSettings($name) ?? [];
         return $this->loadAdapter($adapterName, $settings);
     }
 
@@ -219,7 +192,7 @@ class Context
     ): Adapter {
         $name = ucfirst($name);
 
-        if (!$class = Archetype::tryResolve(Adapter::class, $name)) {
+        if (!$class = $this->archetype->tryResolve(Adapter::class, $name)) {
             throw Exceptional::NotFound(
                 'Telegraph adapter not found: ' . $name
             );
@@ -716,10 +689,3 @@ class Context
         );
     }
 }
-
-
-// Veneer
-Veneer\Manager::getGlobalManager()->register(
-    Context::class,
-    Telegraph::class
-);

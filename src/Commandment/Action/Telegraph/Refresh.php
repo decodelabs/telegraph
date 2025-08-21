@@ -24,7 +24,8 @@ use DecodeLabs\Terminus\Session;
 class Refresh implements Action
 {
     public function __construct(
-        protected Session $io
+        protected Session $io,
+        protected Telegraph $telegraph
     ) {
     }
 
@@ -56,10 +57,10 @@ class Refresh implements Action
         ?string $source = null
     ): array {
         if ($source !== null) {
-            $source = Telegraph::load($source);
+            $source = $this->telegraph->load($source);
             return $source !== null ? [$source] : [];
         }
 
-        return Telegraph::loadAll();
+        return $this->telegraph->loadAll();
     }
 }

@@ -30,8 +30,12 @@ The system is designed as a simplified abstraction in front of third party maili
 Configuration can be defined by any class that implements the `DecodeLabs\Telegraph\Config` interface. The package provides a [Dovetail](https://github.com/decodelabs/dovetail) implementation out of the box however it can be easily replaced with a custom implementation.
 
 ```php
+use DecodeLabs\Monarch;
 use DecodeLabs\Telegraph;
-Telegraph::setConfig(new MyConfig());
+use DecodeLabs\Telegraph\Config;
+
+Monarch::getKingdom()->container->setType(Config::class, MyConfig::class);
+$telegraph = Monarch::getService(Telegraph::class);
 ```
 
 The configuration class must provide access to a list of sources which map a source name to an `Adapter` name, settings that allow the adapter to operate and the ID of the specific list to use from that service.
@@ -39,12 +43,12 @@ The configuration class must provide access to a list of sources which map a sou
 With the default `Dovetail` implementation, your configuration file could look like this:
 
 ```php
-use DecodeLabs\Dovetail;
+use DecodeLabs\Dovetail\Env;
 
 return [
     'main' => [
         'adapter' => 'Mailchimp',
-        'apiKey' => Dovetail::envString('MAILCHIMP_API_KEY'),
+        'apiKey' => Env::asString('MAILCHIMP_API_KEY'),
         'list' => 'abc123abc123'
     ]
 ];
@@ -55,7 +59,7 @@ return [
 Telegraph expects to be able to cache the results of API calls to avoid making unnecessary network requests. The main context accepts an instance of a `Psr\Cache\CacheItemPoolInterface` to use for caching, allowing you to use any cache system that implements the PSR-6 interface. If [Stash](https://github.com/decodelabs/stash) is installed, it will be used by default, otherwise:
 
 ```php
-Telegraph::setCache(new MyPsrCachePool());
+$telegraph->cache = new MyPsrCachePool();
 ```
 
 ## Usage
@@ -63,10 +67,9 @@ Telegraph::setCache(new MyPsrCachePool());
 Once configured, Telegraph provides a simple API for interacting with your sources. Either load a specific source by name and operate on it directly, or use the shortcut methods on the main context to streamline common operations.
 
 ```php
-use DecodeLabs\Telegraph;
 use DecodeLabs\Telegraph\MemberDataRequest;
 
-$source = Telegraph::load('main');
+$source = $telegraph->load('main');
 
 $listInfo = $source->getListInfo();
 echo $listInfo->name;
@@ -95,20 +98,18 @@ if($response->success) {
 Or using the shortcut methods:
 
 ```php
-use DecodeLabs\Telegraph;
 use DecodeLabs\Telegraph\MemberDataRequest;
 
-$listInfo = Telegraph::getListInfo('main');
+$listInfo = $telegraph->getListInfo('main');
 $request = new MemberDataRequest(...);
-$response = Telegraph::subscribe('main', $request);
+$response = $telegraph->subscribe('main', $request);
 ```
 
 Fetch a subscribed member's information:
 
 ```php
-use DecodeLabs\Telegraph;
 
-$memberInfo = Telegraph::getMemberInfo('main', 'test@example.com');
+$memberInfo = $telegraph->getMemberInfo('main', 'test@example.com');
 
 echo $memberInfo->email;
 echo $memberInfo->firstName;
@@ -130,7 +131,6 @@ foreach($memberInfo->tags as $tag) {
 The `MemberDataRequest` class can also be used to update a member's data atomically:
 
 ```php
-use DecodeLabs\Telegraph;
 use DecodeLabs\Telegraph\MemberDataRequest;
 
 // Change name and email
@@ -140,13 +140,12 @@ $request = new MemberDataRequest(
     lastName: 'Else',
 );
 
-$response = Telegraph::update('main', 'test@example.com', $request);
+$response = $telegraph->update('main', 'test@example.com', $request);
 ```
 
 Groups and tags can be enabled or disabled by passing a boolean value with the group or tag key:
 
 ```php
-use DecodeLabs\Telegraph;
 use DecodeLabs\Telegraph\MemberDataRequest;
 
 $request = new MemberDataRequest(
@@ -160,15 +159,14 @@ $request = new MemberDataRequest(
     ]
 );
 
-$response = Telegraph::update('main', 'someone-else@example.com', $request);
+$response = $telegraph->update('main', 'someone-else@example.com', $request);
 ```
 
 Unsubscribing a member just requires the email address:
 
 ```php
-use DecodeLabs\Telegraph;
 
-$response = Telegraph::unsubscribe('main', 'someone-else@example.com');
+$response = $telegraph->unsubscribe('main', 'someone-else@example.com');
 ```
 
 
@@ -187,9 +185,9 @@ Take care not to mix the user and non-user oriented methods where possible - cal
 You can provide a custom `Store` implementation to handle saving List and Member information to your database. See the [Store](./src/Telegraph/Store.php) interface for more details.
 
 ```php
-Telegraph::setStore(new MyStore());
+$telegraph->store = new MyStore();
 
-Telegraph::subscribeUser(
+$telegraph->subscribeUser(
     source: 'main',
     userId: '1234567890',
     request: new MemberDataRequest(
@@ -199,7 +197,7 @@ Telegraph::subscribeUser(
     )
 );
 
-Telegraph::updateUser(
+$telegraph->updateUser(
     source: 'main',
     userId: '1234567890',
     email: 'test@example.com',
@@ -209,13 +207,13 @@ Telegraph::updateUser(
     )
 );
 
-Telegraph::unsubscribeUser(
+$telegraph->unsubscribeUser(
     source: 'main',
     userId: '1234567890',
     email: 'test@example.com'
 );
 
-$info = Telegraph::getUserMemberInfo(
+$info = $telegraph->getUserMemberInfo(
     source: 'main',
     userId: '1234567890',
     email: 'test@example.com'
@@ -230,11 +228,10 @@ If `Disciple` is installed, the following methods can automatically fill in the 
 
 
 ```php
-use DecodeLabs\Telegraph;
 
-Telegraph::subscribeDisciple();
+$telegraph->subscribeDisciple();
 
-Telegraph::updateDisciple(new MemberDataRequest(
+$telegraph->updateDisciple(new MemberDataRequest(
     groups: [
         '1234567890' => true,
     ],
@@ -243,7 +240,7 @@ Telegraph::updateDisciple(new MemberDataRequest(
     ]
 ));
 
-Telegraph::unsubscribeDisciple();
+$telegraph->unsubscribeDisciple();
 ```
 
 
