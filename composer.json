@@ -26,14 +26,14 @@
         "decodelabs/disciple": "^0.6",
         "decodelabs/dovetail": "^0.3.1",
         "decodelabs/phpstan-decodelabs": "^0.7.0",
-        "decodelabs/stash": "^0.7.0",
+        "decodelabs/stash": "^0.8",
         "decodelabs/terminus": "^0.14"
     },
     "conflict": {
         "decodelabs/commandment": "<0.3",
         "decodelabs/disciple": "<0.6",
         "decodelabs/dovetail": "<0.3",
-        "decodelabs/stash": "<0.7",
+        "decodelabs/stash": "<0.8",
         "decodelabs/terminus": "<0.14"
     },
     "suggest": {
