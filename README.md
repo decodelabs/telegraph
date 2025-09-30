@@ -15,6 +15,8 @@ Telegraph provides a simple and opinionated way to manage and interact with thir
 
 ## Installation
 
+This package requires PHP 8.4 or higher.
+
 Install via Composer:
 
 ```bash
