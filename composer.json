@@ -24,7 +24,7 @@
         "psr/cache": "^3.0"
     },
     "require-dev": {
-        "decodelabs/chorus": "^0.1",
+        "decodelabs/chorus": ">0",
         "decodelabs/commandment": "^0.3",
         "decodelabs/disciple": "^0.6",
         "decodelabs/dovetail": "^0.3.1",
