@@ -179,6 +179,7 @@ class Telegraph implements Service
             return null;
         }
 
+        // @phpstan-ignore-next-line
         $settings = $this->config?->getSourceSettings($name) ?? [];
         return $this->loadAdapter($adapterName, $settings);
     }
