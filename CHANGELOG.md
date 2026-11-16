@@ -5,10 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+--
+
+---
+
+### [v0.5.4](https://github.com/decodelabs/telegraph/commits/v0.5.4) - 16th November 2026
+
 - Made public read visibility explicit on promoted properties
 - Improved doc comment headers
 - Added AGENTS.md
 - Integrated Chorus dev dependency
+
+[Full list of changes](https://github.com/decodelabs/telegraph/compare/v0.5.3...v0.5.4)
 
 ---
 
@@ -224,4 +232,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added initial boilerplate
 - Ported SubscriptionResponse from r7
-
