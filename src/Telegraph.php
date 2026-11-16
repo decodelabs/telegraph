@@ -75,8 +75,8 @@ class Telegraph implements Service
         ?Config $config,
         ?Store $store,
         ?Cache $cache,
-        protected(set) Archetype $archetype,
-        protected(set) ?Disciple $disciple = null
+        public protected(set) Archetype $archetype,
+        public protected(set) ?Disciple $disciple = null
     ) {
         $this->config = $config;
         $this->store = $store;
